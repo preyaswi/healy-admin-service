@@ -3,6 +3,7 @@ module healy-admin
 go 1.21.5
 
 require (
+	github.com/razorpay/razorpay-go v1.3.2
 	github.com/spf13/viper v1.18.2
 	golang.org/x/crypto v0.19.0
 )

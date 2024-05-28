@@ -9,6 +9,9 @@ type Config struct {
 	DBPort     string `mapstructure:"DB_PORT"`
 	DBPassword string `mapstructure:"DB_PASSWORD"`
 	Port       string `mapstructure:"PORT"`
+	
+	KEY_ID_fOR_PAY     string `mapstructure:"KEY_ID_fOR_PAY"`
+	SECRET_KEY_FOR_PAY string `mapstructure:"SECRET_KEY_FOR_PAY"`
 }
 
 var envs = []string{

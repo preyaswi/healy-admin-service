@@ -65,3 +65,37 @@ func (ad *AdminServer) AdminLogin(ctx context.Context, Req *pb.AdminLoginInReque
 		Token:        admin.Token,
 	}, nil
 }
+func (ad *AdminServer)MakePaymentRazorpay(ctx context.Context,req *pb.PaymentReq)(*pb.PaymentRes,error)  {
+	paymentdetail:=models.Paymentreq{
+		PatientId: uint(req.PatientId),
+		DoctorId: uint(req.DoctorId),
+		DoctorName: req.DoctorName,
+		Fees: req.Fees,
+	}
+	paymentDetails,razorId,err:=ad.adminUseCase.MakePaymentRazorpay(paymentdetail)
+	if err!=nil{
+		return &pb.PaymentRes{},err
+	}
+	paymentDetail:=&pb.PaymentDetails{
+		PaymentId: uint32(paymentDetails.PaymentId),
+		PatientId: uint32(paymentDetails.PatientId),
+		DoctorId: uint32(paymentDetails.DoctorId),
+		DoctorName: paymentDetails.DoctorName,
+		Fees: paymentDetails.Fees,
+		PaymentStatus: paymentDetails.PaymentStatus,
+
+	}
+	return &pb.PaymentRes{
+		PaymentDetails: paymentDetail,
+		Razorid: razorId,
+	},nil
+	
+	
+}
+func (ad *AdminServer)VerifyPayment(ctx context.Context,req *pb.Verifyreq) (*pb.Verifyres, error) {
+	err:=ad.adminUseCase.VerifyPayment(int(req.PaymentId))
+	if err!=nil{
+		return &pb.Verifyres{},err
+	}
+	return &pb.Verifyres{},nil
+}

@@ -2,14 +2,16 @@ package usecase
 
 import (
 	"errors"
-	"fmt"
+	"healy-admin/pkg/config"
 	"healy-admin/pkg/domain"
 	"healy-admin/pkg/helper"
 	interfaces "healy-admin/pkg/repository/interface"
 	services "healy-admin/pkg/usecase/interface"
 	"healy-admin/pkg/utils/models"
+	"strings"
 
 	"github.com/jinzhu/copier"
+	"github.com/razorpay/razorpay-go"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -24,7 +26,6 @@ func NewAdminUseCase(repository interfaces.AdminRepository) services.AdminUseCas
 }
 func (ad *adminUseCase) AdminSignUp(admin models.AdminSignUp) (*domain.TokenAdmin, error) {
 	email, err := ad.adminRepository.CheckAdminExistsByEmail(admin.Email)
-	fmt.Println(email)
 	if err != nil {
 		return &domain.TokenAdmin{}, errors.New("error with server")
 	}
@@ -86,4 +87,42 @@ func (ad *adminUseCase) LoginHandler(admin models.AdminLogin) (*domain.TokenAdmi
 		Admin: adminDetailsResponse,
 		Token: tokenString,
 	}, nil
+}
+func (ad *adminUseCase) MakePaymentRazorpay(payment models.Paymentreq) (domain.Payment, string, error) {
+	cfg, _ := config.LoadConfig()
+	paymentdetail, err := ad.adminRepository.AddPaymentDetails(payment)
+	if err != nil {
+		return domain.Payment{}, "", err
+	}
+	client := razorpay.NewClient(cfg.KEY_ID_fOR_PAY, cfg.SECRET_KEY_FOR_PAY)
+	data := map[string]interface{}{
+		"amount":   int(paymentdetail.Fees) * 100,
+		"currency": "INR",
+		"receipt":  "some_receipt_id",
+	}
+	body, err := client.Order.Create(data, nil)
+	if err != nil {
+		return domain.Payment{}, "", err
+	}
+	RazorpayorderId := body["id"].(string)
+	err = ad.adminRepository.AddRazorPayDetails(paymentdetail.PaymentId, RazorpayorderId)
+	if err != nil {
+		return domain.Payment{}, "", err
+	}
+	return paymentdetail, RazorpayorderId, nil
+}
+func (ad *adminUseCase)VerifyPayment(payment_id int)error{
+	status,err:=ad.adminRepository.CheckPaymentStatus(payment_id)
+	if err!=nil{
+		return err
+	}
+	status = strings.TrimSpace(strings.ToLower(status))
+	if status=="pending"{
+		if err:= ad.adminRepository.UpdatePaymentStatus(payment_id,"paid");err!=nil{
+			return err
+		}
+		return nil
+	}else {
+	return errors.New("already paid")
+	}
 }

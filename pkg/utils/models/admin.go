@@ -18,3 +18,16 @@ type AdminSignUp struct {
 	Email     string `json:"email"`
 	Password  string `json:"password"`
 }
+type Paymentreq struct{
+	PatientId uint
+	DoctorId uint
+	DoctorName string
+	Fees uint64
+}
+type PaymentDetails struct{
+	PatientId uint
+	DoctorId uint
+	Fees uint64
+	PaymentStatus string
+}
+
