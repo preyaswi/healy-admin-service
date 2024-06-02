@@ -10,12 +10,13 @@ type Config struct {
 	DBPassword string `mapstructure:"DB_PASSWORD"`
 	Port       string `mapstructure:"PORT"`
 	
+	DOCTOR_SVC string `mapstructure:"DOCTOR_SVC"`
 	KEY_ID_fOR_PAY     string `mapstructure:"KEY_ID_fOR_PAY"`
 	SECRET_KEY_FOR_PAY string `mapstructure:"SECRET_KEY_FOR_PAY"`
 }
 
 var envs = []string{
-	"DB_HOST", "DB_NAME", "DB_USER", "DB_PORT", "DB_PASSWORD", "PORT",
+	"DB_HOST", "DB_NAME", "DB_USER", "DB_PORT", "DB_PASSWORD", "PORT","DOCTOR-SVC","KEY_ID_fOR_PAY","SECRET_KEY_FOR_PAY",
 }
 
 func LoadConfig() (Config, error) {

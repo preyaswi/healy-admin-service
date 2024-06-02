@@ -3,6 +3,7 @@ package di
 import (
 	server "healy-admin/pkg/api"
 	"healy-admin/pkg/api/service"
+	"healy-admin/pkg/client"
 	"healy-admin/pkg/config"
 	"healy-admin/pkg/db"
 	"healy-admin/pkg/repository"
@@ -16,7 +17,9 @@ func InitializeAPI(cfg config.Config) (*server.Server, error) {
 	}
 
 	adminRepository := repository.NewAdminRepository(gormDB)
-	adminUseCase := usecase.NewAdminUseCase(adminRepository)
+	doctorClient:=client.NewdoctorClient(&cfg)
+	adminUseCase := usecase.NewAdminUseCase(adminRepository,doctorClient)
+
 	adminServiceServer := service.NewAdminServer(adminUseCase)
 	grpcServer, err := server.NewGRPCServer(cfg, adminServiceServer)
 

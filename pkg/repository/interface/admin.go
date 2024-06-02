@@ -10,8 +10,11 @@ type AdminRepository interface {
 	FindAdminByEmail(admin models.AdminLogin) (models.AdminSignUp, error)
 	CheckAdminExistsByEmail(email string) (*domain.Admin, error)
 
-	AddPaymentDetails(payment models.Paymentreq)(domain.Payment, error)
-	AddRazorPayDetails(paymentID uint,razorPaypaymentID string) error
-	CheckPaymentStatus(paymentId int)(string,error)
-	UpdatePaymentStatus(paymentId int,status string)error
+	AddToBooking(patientid int,doctordetail models.BookingDoctorDetails)error
+	GetBookingByID(bookingid int)(domain.Booking,error)
+	RemoveBooking(bookingID int) error
+
+	AddRazorPayDetails(bookingid uint,razorPaypaymentID string) error
+	CheckPaymentStatus(bookingid int) (string, error)
+	UpdatePaymentStatus(bookingid int,status string)error
 }

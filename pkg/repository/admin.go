@@ -46,34 +46,41 @@ func (ad *adminRepository) FindAdminByEmail(admin models.AdminLogin) (models.Adm
 	}
 	return user, nil
 }
-func  (ad *adminRepository)AddPaymentDetails(payment models.Paymentreq)(domain.Payment, error) {
-	newPayment := domain.Payment{
-        PatientId:  payment.PatientId,
-        DoctorId:   payment.DoctorId,
-        DoctorName: payment.DoctorName,
-        Fees:       payment.Fees,
-        PaymentStatus: "Pending", // Assuming initial status is pending
-    }
 
-    // Insert the payment record
-    if err := ad.DB.Create(&newPayment).Error; err != nil {
-        return domain.Payment{}, err
-    }
 
-    // Return the inserted payment record
-    return newPayment, nil
+func (ad *adminRepository)AddToBooking(patientid int,doctordetail models.BookingDoctorDetails)error  {
+	err:=ad.DB.Exec("insert into bookings(patient_id,doctor_id,doctor_name,doctor_email,fees)values(?,?,?,?,?)",patientid,doctordetail.Doctorid,doctordetail.DoctorName,doctordetail.DoctorEmail,doctordetail.Fees).Error
+	if err!=nil{
+		return err
+	}
+	return nil
 }
-func (ad *adminRepository)AddRazorPayDetails(paymentID uint , razorPaypaymentID string) error{
-	err:=ad.DB.Exec("insert into razer_pays (payment_id,razor_id) values (?,?)",paymentID,razorPaypaymentID).Error
+func (ad *adminRepository)GetBookingByID(bookingid int)(domain.Booking,error)  {
+	var booking domain.Booking
+	err:=ad.DB.Where("booking_id=?",bookingid).First(&booking).Error
+	if err!=nil{
+		return domain.Booking{},err
+	}
+	return booking,nil
+}
+func (ad *adminRepository)RemoveBooking(bookingID int) error  {
+	err:=ad.DB.Where("booking_id=?",bookingID).Delete(&domain.Booking{}).Error
+	if err != nil {
+        return err
+    }
+    return nil
+}
+func (ad *adminRepository)AddRazorPayDetails(booking_id uint , razorPaypaymentID string) error{
+	err:=ad.DB.Exec("insert into razer_pays (booking_id,razor_id) values (?,?)",booking_id,razorPaypaymentID).Error
 	if err!=nil{
 		return err
 	}
 	return nil
 	
 }
-func (ad *adminRepository)CheckPaymentStatus(paymentId int)(string,error)  {
-	var payment domain.Payment
-    if err := ad.DB.First(&payment, paymentId).Error; err != nil {
+func (ad *adminRepository)CheckPaymentStatus(bookingid int)(string,error)  {
+	var payment domain.Booking
+    if err := ad.DB.First(&payment, bookingid).Error; err != nil {
         if errors.Is(err, gorm.ErrRecordNotFound) {
             return "", errors.New("payment not found")
         }
@@ -81,8 +88,8 @@ func (ad *adminRepository)CheckPaymentStatus(paymentId int)(string,error)  {
     }
     return payment.PaymentStatus, nil
 }
-func (ad *adminRepository)UpdatePaymentStatus(paymentId int,status string)error  {
-err:=ad.DB.Model(&domain.Payment{}).Where("payment_id = ?", paymentId).Update("payment_status", status).Error
+func (ad *adminRepository)UpdatePaymentStatus(booking_id int,status string)error  {
+err:=ad.DB.Model(&domain.Booking{}).Where("booking_id = ?", booking_id).Update("payment_status", status).Error
 if err!=nil{
 	return err
 }

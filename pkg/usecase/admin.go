@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"errors"
+	clientinterface "healy-admin/pkg/client/interface"
 	"healy-admin/pkg/config"
 	"healy-admin/pkg/domain"
 	"healy-admin/pkg/helper"
@@ -16,12 +17,14 @@ import (
 )
 
 type adminUseCase struct {
-	adminRepository interfaces.AdminRepository
+	adminRepository  interfaces.AdminRepository
+	doctorRepository clientinterface.NewDoctorClient
 }
 
-func NewAdminUseCase(repository interfaces.AdminRepository) services.AdminUseCase {
+func NewAdminUseCase(repository interfaces.AdminRepository, doctorRepo clientinterface.NewDoctorClient) services.AdminUseCase {
 	return &adminUseCase{
-		adminRepository: repository,
+		adminRepository:  repository,
+		doctorRepository: doctorRepo,
 	}
 }
 func (ad *adminUseCase) AdminSignUp(admin models.AdminSignUp) (*domain.TokenAdmin, error) {
@@ -88,11 +91,41 @@ func (ad *adminUseCase) LoginHandler(admin models.AdminLogin) (*domain.TokenAdmi
 		Token: tokenString,
 	}, nil
 }
-func (ad *adminUseCase) MakePaymentRazorpay(payment models.Paymentreq) (domain.Payment, string, error) {
-	cfg, _ := config.LoadConfig()
-	paymentdetail, err := ad.adminRepository.AddPaymentDetails(payment)
+func (ad *adminUseCase) AddToBooking(patientid, doctorid int) error {
+	ok, err := ad.doctorRepository.CheckDoctor(doctorid)
 	if err != nil {
-		return domain.Payment{}, "", err
+		return err
+	}
+	if !ok {
+		return errors.New("doctor doesn't exist")
+	}
+	doctordetail, err := ad.doctorRepository.DoctorDetailforBooking(doctorid)
+	if err != nil {
+		return err
+	}
+	err = ad.adminRepository.AddToBooking(patientid, doctordetail)
+	if err != nil {
+		return err
+	}
+	return nil
+
+}
+func (ad *adminUseCase) CancelBooking(patientid, bookingid int) error {
+	booking, err := ad.adminRepository.GetBookingByID(bookingid)
+	if err != nil {
+		return err
+	}
+	if booking.PatientId != uint(patientid) {
+		return errors.New("unauthorized: patient ID does not match booking")
+	}
+	return ad.adminRepository.RemoveBooking(bookingid)
+
+}
+func (ad *adminUseCase) MakePaymentRazorpay(bookingid int) (domain.Booking, string, error) {
+	cfg, _ := config.LoadConfig()
+	paymentdetail, err := ad.adminRepository.GetBookingByID(bookingid)
+	if err != nil {
+		return domain.Booking{}, "", err
 	}
 	client := razorpay.NewClient(cfg.KEY_ID_fOR_PAY, cfg.SECRET_KEY_FOR_PAY)
 	data := map[string]interface{}{
@@ -102,27 +135,27 @@ func (ad *adminUseCase) MakePaymentRazorpay(payment models.Paymentreq) (domain.P
 	}
 	body, err := client.Order.Create(data, nil)
 	if err != nil {
-		return domain.Payment{}, "", err
+		return domain.Booking{}, "", err
 	}
 	RazorpayorderId := body["id"].(string)
-	err = ad.adminRepository.AddRazorPayDetails(paymentdetail.PaymentId, RazorpayorderId)
+	err = ad.adminRepository.AddRazorPayDetails(paymentdetail.BookingId, RazorpayorderId)
 	if err != nil {
-		return domain.Payment{}, "", err
+		return domain.Booking{}, "", err
 	}
 	return paymentdetail, RazorpayorderId, nil
 }
-func (ad *adminUseCase)VerifyPayment(payment_id int)error{
-	status,err:=ad.adminRepository.CheckPaymentStatus(payment_id)
-	if err!=nil{
+func (ad *adminUseCase) VerifyPayment(booking_id int) error {
+	status, err := ad.adminRepository.CheckPaymentStatus(booking_id)
+	if err != nil {
 		return err
 	}
 	status = strings.TrimSpace(strings.ToLower(status))
-	if status=="pending"{
-		if err:= ad.adminRepository.UpdatePaymentStatus(payment_id,"paid");err!=nil{
+	if status == "not paid" {
+		if err := ad.adminRepository.UpdatePaymentStatus(booking_id, "paid"); err != nil {
 			return err
 		}
 		return nil
-	}else {
-	return errors.New("already paid")
+	} else {
+		return errors.New("already paid")
 	}
 }

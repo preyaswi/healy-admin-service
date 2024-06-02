@@ -2,9 +2,9 @@ package service
 
 import (
 	"context"
+	pb "healy-admin/pkg/pb/admin"
 	interfaces "healy-admin/pkg/usecase/interface"
 	"healy-admin/pkg/utils/models"
-	pb "healy-admin/pkg/pb/admin"
 )
 
 type AdminServer struct {
@@ -65,22 +65,34 @@ func (ad *AdminServer) AdminLogin(ctx context.Context, Req *pb.AdminLoginInReque
 		Token:        admin.Token,
 	}, nil
 }
-func (ad *AdminServer)MakePaymentRazorpay(ctx context.Context,req *pb.PaymentReq)(*pb.PaymentRes,error)  {
-	paymentdetail:=models.Paymentreq{
-		PatientId: uint(req.PatientId),
-		DoctorId: uint(req.DoctorId),
-		DoctorName: req.DoctorName,
-		Fees: req.Fees,
+func (ad *AdminServer)AddTobookings(ctx context.Context,req *pb.Bookingreq) (*pb.Bookingres, error)  {
+	err:=ad.adminUseCase.AddToBooking(int(req.PatientId),int(req.DoctorId))
+	if err!=nil{
+		return &pb.Bookingres{},err
 	}
-	paymentDetails,razorId,err:=ad.adminUseCase.MakePaymentRazorpay(paymentdetail)
+	return &pb.Bookingres{},nil
+}
+func (ad *AdminServer)CancelBookings(ctx context.Context,req  *pb.Canbookingreq) (*pb.Bookingres, error)  {
+	err:=ad.adminUseCase.CancelBooking(int(req.PatientId),int(req.BookingId))
+	if err!=nil{
+		return &pb.Bookingres{},err
+	}
+	return &pb.Bookingres{},nil
+}
+func (ad *AdminServer)MakePaymentRazorpay(ctx context.Context,req *pb.PaymentReq)(*pb.PaymentRes,error)  {
+	bookingid:=models.Paymentreq{
+		Bookingid: uint(req.BookingId),
+	}
+	paymentDetails,razorId,err:=ad.adminUseCase.MakePaymentRazorpay(int(bookingid.Bookingid))
 	if err!=nil{
 		return &pb.PaymentRes{},err
 	}
 	paymentDetail:=&pb.PaymentDetails{
-		PaymentId: uint32(paymentDetails.PaymentId),
+		BookingId: uint32(paymentDetails.BookingId),
 		PatientId: uint32(paymentDetails.PatientId),
 		DoctorId: uint32(paymentDetails.DoctorId),
 		DoctorName: paymentDetails.DoctorName,
+		DoctorEmail: paymentDetails.DoctorEmail,
 		Fees: paymentDetails.Fees,
 		PaymentStatus: paymentDetails.PaymentStatus,
 
@@ -92,8 +104,8 @@ func (ad *AdminServer)MakePaymentRazorpay(ctx context.Context,req *pb.PaymentReq
 	
 	
 }
-func (ad *AdminServer)VerifyPayment(ctx context.Context,req *pb.Verifyreq) (*pb.Verifyres, error) {
-	err:=ad.adminUseCase.VerifyPayment(int(req.PaymentId))
+func (ad *AdminServer)VerifyPayment(ctx context.Context,req *pb.PaymentReq) (*pb.Verifyres, error) {
+	err:=ad.adminUseCase.VerifyPayment(int(req.BookingId))
 	if err!=nil{
 		return &pb.Verifyres{},err
 	}

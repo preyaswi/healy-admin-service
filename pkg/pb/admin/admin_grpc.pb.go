@@ -21,6 +21,8 @@ const _ = grpc.SupportPackageIsVersion7
 const (
 	Admin_AdminSignup_FullMethodName         = "/admin.Admin/AdminSignup"
 	Admin_AdminLogin_FullMethodName          = "/admin.Admin/AdminLogin"
+	Admin_AddTobookings_FullMethodName       = "/admin.Admin/AddTobookings"
+	Admin_CancelBookings_FullMethodName      = "/admin.Admin/CancelBookings"
 	Admin_MakePaymentRazorpay_FullMethodName = "/admin.Admin/MakePaymentRazorpay"
 	Admin_VerifyPayment_FullMethodName       = "/admin.Admin/VerifyPayment"
 )
@@ -31,8 +33,10 @@ const (
 type AdminClient interface {
 	AdminSignup(ctx context.Context, in *AdminSignupRequest, opts ...grpc.CallOption) (*AdminSignupResponse, error)
 	AdminLogin(ctx context.Context, in *AdminLoginInRequest, opts ...grpc.CallOption) (*AdminLoginResponse, error)
+	AddTobookings(ctx context.Context, in *Bookingreq, opts ...grpc.CallOption) (*Bookingres, error)
+	CancelBookings(ctx context.Context, in *Canbookingreq, opts ...grpc.CallOption) (*Bookingres, error)
 	MakePaymentRazorpay(ctx context.Context, in *PaymentReq, opts ...grpc.CallOption) (*PaymentRes, error)
-	VerifyPayment(ctx context.Context, in *Verifyreq, opts ...grpc.CallOption) (*Verifyres, error)
+	VerifyPayment(ctx context.Context, in *PaymentReq, opts ...grpc.CallOption) (*Verifyres, error)
 }
 
 type adminClient struct {
@@ -61,6 +65,24 @@ func (c *adminClient) AdminLogin(ctx context.Context, in *AdminLoginInRequest, o
 	return out, nil
 }
 
+func (c *adminClient) AddTobookings(ctx context.Context, in *Bookingreq, opts ...grpc.CallOption) (*Bookingres, error) {
+	out := new(Bookingres)
+	err := c.cc.Invoke(ctx, Admin_AddTobookings_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *adminClient) CancelBookings(ctx context.Context, in *Canbookingreq, opts ...grpc.CallOption) (*Bookingres, error) {
+	out := new(Bookingres)
+	err := c.cc.Invoke(ctx, Admin_CancelBookings_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *adminClient) MakePaymentRazorpay(ctx context.Context, in *PaymentReq, opts ...grpc.CallOption) (*PaymentRes, error) {
 	out := new(PaymentRes)
 	err := c.cc.Invoke(ctx, Admin_MakePaymentRazorpay_FullMethodName, in, out, opts...)
@@ -70,7 +92,7 @@ func (c *adminClient) MakePaymentRazorpay(ctx context.Context, in *PaymentReq, o
 	return out, nil
 }
 
-func (c *adminClient) VerifyPayment(ctx context.Context, in *Verifyreq, opts ...grpc.CallOption) (*Verifyres, error) {
+func (c *adminClient) VerifyPayment(ctx context.Context, in *PaymentReq, opts ...grpc.CallOption) (*Verifyres, error) {
 	out := new(Verifyres)
 	err := c.cc.Invoke(ctx, Admin_VerifyPayment_FullMethodName, in, out, opts...)
 	if err != nil {
@@ -85,8 +107,10 @@ func (c *adminClient) VerifyPayment(ctx context.Context, in *Verifyreq, opts ...
 type AdminServer interface {
 	AdminSignup(context.Context, *AdminSignupRequest) (*AdminSignupResponse, error)
 	AdminLogin(context.Context, *AdminLoginInRequest) (*AdminLoginResponse, error)
+	AddTobookings(context.Context, *Bookingreq) (*Bookingres, error)
+	CancelBookings(context.Context, *Canbookingreq) (*Bookingres, error)
 	MakePaymentRazorpay(context.Context, *PaymentReq) (*PaymentRes, error)
-	VerifyPayment(context.Context, *Verifyreq) (*Verifyres, error)
+	VerifyPayment(context.Context, *PaymentReq) (*Verifyres, error)
 	mustEmbedUnimplementedAdminServer()
 }
 
@@ -100,10 +124,16 @@ func (UnimplementedAdminServer) AdminSignup(context.Context, *AdminSignupRequest
 func (UnimplementedAdminServer) AdminLogin(context.Context, *AdminLoginInRequest) (*AdminLoginResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AdminLogin not implemented")
 }
+func (UnimplementedAdminServer) AddTobookings(context.Context, *Bookingreq) (*Bookingres, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddTobookings not implemented")
+}
+func (UnimplementedAdminServer) CancelBookings(context.Context, *Canbookingreq) (*Bookingres, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CancelBookings not implemented")
+}
 func (UnimplementedAdminServer) MakePaymentRazorpay(context.Context, *PaymentReq) (*PaymentRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method MakePaymentRazorpay not implemented")
 }
-func (UnimplementedAdminServer) VerifyPayment(context.Context, *Verifyreq) (*Verifyres, error) {
+func (UnimplementedAdminServer) VerifyPayment(context.Context, *PaymentReq) (*Verifyres, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method VerifyPayment not implemented")
 }
 func (UnimplementedAdminServer) mustEmbedUnimplementedAdminServer() {}
@@ -155,6 +185,42 @@ func _Admin_AdminLogin_Handler(srv interface{}, ctx context.Context, dec func(in
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Admin_AddTobookings_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Bookingreq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AdminServer).AddTobookings(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Admin_AddTobookings_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AdminServer).AddTobookings(ctx, req.(*Bookingreq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Admin_CancelBookings_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Canbookingreq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AdminServer).CancelBookings(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Admin_CancelBookings_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AdminServer).CancelBookings(ctx, req.(*Canbookingreq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Admin_MakePaymentRazorpay_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(PaymentReq)
 	if err := dec(in); err != nil {
@@ -174,7 +240,7 @@ func _Admin_MakePaymentRazorpay_Handler(srv interface{}, ctx context.Context, de
 }
 
 func _Admin_VerifyPayment_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Verifyreq)
+	in := new(PaymentReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -186,7 +252,7 @@ func _Admin_VerifyPayment_Handler(srv interface{}, ctx context.Context, dec func
 		FullMethod: Admin_VerifyPayment_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AdminServer).VerifyPayment(ctx, req.(*Verifyreq))
+		return srv.(AdminServer).VerifyPayment(ctx, req.(*PaymentReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -205,6 +271,14 @@ var Admin_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "AdminLogin",
 			Handler:    _Admin_AdminLogin_Handler,
+		},
+		{
+			MethodName: "AddTobookings",
+			Handler:    _Admin_AddTobookings_Handler,
+		},
+		{
+			MethodName: "CancelBookings",
+			Handler:    _Admin_CancelBookings_Handler,
 		},
 		{
 			MethodName: "MakePaymentRazorpay",

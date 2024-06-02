@@ -8,7 +8,9 @@ import (
 type AdminUseCase interface {
 	AdminSignUp(admindeatils models.AdminSignUp) (*domain.TokenAdmin, error)
 	LoginHandler(adminDetails models.AdminLogin) (*domain.TokenAdmin, error)
-	MakePaymentRazorpay(paymentdetail models.Paymentreq)(domain.Payment,string,error)
-	VerifyPayment(payment_id int)error
+	AddToBooking(patientid,doctorid int)error
+	CancelBooking(patientid,bookingid int)error
+	MakePaymentRazorpay(bookingid int )(domain.Booking,string,error)
+	VerifyPayment(booking_id int)error
 
 }
