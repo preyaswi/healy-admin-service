@@ -17,4 +17,5 @@ type AdminRepository interface {
 	AddRazorPayDetails(bookingid uint,razorPaypaymentID string) error
 	CheckPaymentStatus(bookingid int) (string, error)
 	UpdatePaymentStatus(bookingid int,status string)error
+	GetPaidBookingsByDoctorID(doctorId int)([]domain.Booking,error)
 }

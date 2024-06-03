@@ -10,6 +10,7 @@ import (
 	services "healy-admin/pkg/usecase/interface"
 	"healy-admin/pkg/utils/models"
 	"strings"
+	"sync"
 
 	"github.com/jinzhu/copier"
 	"github.com/razorpay/razorpay-go"
@@ -17,14 +18,16 @@ import (
 )
 
 type adminUseCase struct {
-	adminRepository  interfaces.AdminRepository
-	doctorRepository clientinterface.NewDoctorClient
+	adminRepository   interfaces.AdminRepository
+	doctorRepository  clientinterface.NewDoctorClient
+	patientRepository clientinterface.NewPatientClient
 }
 
-func NewAdminUseCase(repository interfaces.AdminRepository, doctorRepo clientinterface.NewDoctorClient) services.AdminUseCase {
+func NewAdminUseCase(repository interfaces.AdminRepository, doctorRepo clientinterface.NewDoctorClient, patientrepo clientinterface.NewPatientClient) services.AdminUseCase {
 	return &adminUseCase{
-		adminRepository:  repository,
-		doctorRepository: doctorRepo,
+		adminRepository:   repository,
+		doctorRepository:  doctorRepo,
+		patientRepository: patientrepo,
 	}
 }
 func (ad *adminUseCase) AdminSignUp(admin models.AdminSignUp) (*domain.TokenAdmin, error) {
@@ -159,3 +162,53 @@ func (ad *adminUseCase) VerifyPayment(booking_id int) error {
 		return errors.New("already paid")
 	}
 }
+
+func (ad *adminUseCase) GetPaidPatients(doctor_id int) ([]models.Patient, error) {
+	bookings, err := ad.adminRepository.GetPaidBookingsByDoctorID(doctor_id)
+	if err != nil {
+		return nil, err
+	}
+	patientChan := make(chan models.Patient)
+	errorChan := make(chan error)
+	var wg sync.WaitGroup
+
+
+	for _, booking := range bookings {
+		wg.Add(1)
+		go func (patientid int)  {
+			defer wg.Done()
+			patient, err := ad.patientRepository.GetPatientByID(patientid)
+
+			if err != nil {
+				errorChan <- err
+				return
+			}
+			patientChan <- patient
+
+		}(int(booking.PatientId))
+	}
+	go func() {
+		wg.Wait()
+		close(patientChan)
+		close(errorChan)
+	}()
+	var patients []models.Patient
+	for {
+		select {
+		case patient, ok := <-patientChan:
+			if ok {
+				patients = append(patients, patient)
+			}
+		case err, ok := <-errorChan:
+			if ok {
+				return nil, err
+			}
+		}
+		if len(patientChan) == 0 && len(errorChan) == 0 {
+			break
+		}
+	}
+
+	return patients, nil
+}
+

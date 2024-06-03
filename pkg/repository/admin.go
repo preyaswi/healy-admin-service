@@ -95,3 +95,11 @@ if err!=nil{
 }
 return nil
 }
+func (ad *adminRepository)GetPaidBookingsByDoctorID(doctorId int)([]domain.Booking,error)  {
+	var bookings []domain.Booking
+	err:=ad.DB.Where("doctor_id = ? AND payment_status = ?", doctorId, "paid").Find(&bookings).Error
+	if err != nil {
+        return nil, err
+    }
+    return bookings, nil
+}

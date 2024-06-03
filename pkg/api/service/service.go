@@ -111,3 +111,24 @@ func (ad *AdminServer)VerifyPayment(ctx context.Context,req *pb.PaymentReq) (*pb
 	}
 	return &pb.Verifyres{},nil
 }
+func (ad *AdminServer)GetPaidPatients(ctx context.Context,req *pb.GetPaidPatientsRequest) (*pb.GetPaidPatientsResponse, error) {
+	patients,err:=ad.adminUseCase.GetPaidPatients(int(req.DoctorId))
+	if err!=nil{
+		return &pb.GetPaidPatientsResponse{},err
+	}
+	patientdetails:=make([]*pb.Patient,len(patients))
+	for i,patient:=range patients{
+		patientdetails[i]=&pb.Patient{
+			Id:uint32(patient.Id) ,
+			Fullname: patient.Fullname,
+			Email: patient.Email,
+			Gender: patient.Gender,
+			Contactnumber: patient.Contactnumber,
+		}
+	}
+	return &pb.GetPaidPatientsResponse{
+		Patients: patientdetails,
+	},nil
+}
+
+

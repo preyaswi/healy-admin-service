@@ -12,5 +12,5 @@ type AdminUseCase interface {
 	CancelBooking(patientid,bookingid int)error
 	MakePaymentRazorpay(bookingid int )(domain.Booking,string,error)
 	VerifyPayment(booking_id int)error
-
+	GetPaidPatients(doctor_id int)([]models.Patient,error)
 }
