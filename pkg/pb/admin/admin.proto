@@ -15,6 +15,8 @@ service Admin{
     rpc VerifyPayment(paymentReq)returns(verifyres) {};
 
     rpc GetPaidPatients(GetPaidPatientsRequest)returns(GetPaidPatientsResponse){};
+    rpc CreatePrescription(CreatePrescriptionRequest) returns (CreatePrescriptionResponse);
+    
 }
 message AdminSignupRequest{
     string firstname=1;
@@ -84,4 +86,22 @@ message Patient {
 
 message GetPaidPatientsResponse {
   repeated Patient patients = 1;
+}
+message CreatePrescriptionRequest {
+    uint32 booking_id = 1;
+    uint32 doctor_id = 2;
+    uint32 patient_id = 3;
+    string medicine = 4;
+    string dosage = 5;
+    string notes = 6;
+}
+
+message CreatePrescriptionResponse {
+    uint32 id = 1;
+    uint32 booking_id = 2;
+    uint32 doctor_id = 3;
+    uint32 patient_id = 4;
+    string medicine = 5;
+    string dosage = 6;
+    string notes = 7;
 }

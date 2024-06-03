@@ -130,5 +130,26 @@ func (ad *AdminServer)GetPaidPatients(ctx context.Context,req *pb.GetPaidPatient
 		Patients: patientdetails,
 	},nil
 }
-
-
+func (ad *AdminServer)CreatePrescription(ctx context.Context,req *pb.CreatePrescriptionRequest) (*pb.CreatePrescriptionResponse, error)  {
+	prescriptionreq:=models.PrescriptionRequest{
+		DoctorID: int(req.DoctorId),
+		PatientID: int(req.PatientId),
+		BookingID: int(req.BookingId),
+		Medicine: req.Medicine,
+		Dosage: req.Dosage,
+		Notes: req.Notes,
+	}
+	prescription,err:=ad.adminUseCase.CreatePrescription(prescriptionreq)
+	if err!=nil{
+		return &pb.CreatePrescriptionResponse{},err
+	}
+	return &pb.CreatePrescriptionResponse{
+		Id: uint32(prescription.ID),
+		BookingId: uint32(prescription.BookingID),
+		DoctorId: uint32(prescription.DoctorID),
+		PatientId: uint32(prescription.PatientID),
+		Medicine: prescription.Medicine,
+		Dosage: prescription.Dosage,
+		Notes: prescription.Notes,
+	},nil
+}

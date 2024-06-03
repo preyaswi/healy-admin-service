@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"errors"
+	"fmt"
 	clientinterface "healy-admin/pkg/client/interface"
 	"healy-admin/pkg/config"
 	"healy-admin/pkg/domain"
@@ -172,10 +173,9 @@ func (ad *adminUseCase) GetPaidPatients(doctor_id int) ([]models.Patient, error)
 	errorChan := make(chan error)
 	var wg sync.WaitGroup
 
-
 	for _, booking := range bookings {
 		wg.Add(1)
-		go func (patientid int)  {
+		go func(patientid int) {
 			defer wg.Done()
 			patient, err := ad.patientRepository.GetPatientByID(patientid)
 
@@ -211,4 +211,20 @@ func (ad *adminUseCase) GetPaidPatients(doctor_id int) ([]models.Patient, error)
 
 	return patients, nil
 }
+func (ad *adminUseCase) CreatePrescription(prescription models.PrescriptionRequest) (domain.Prescription, error) {
+	paid, err := ad.adminRepository.CheckPatientPayment(prescription.DoctorID, prescription.PatientID)
+	if err != nil {
+		return domain.Prescription{}, fmt.Errorf("error checking payment status")
+	}
 
+	if !paid {
+		return domain.Prescription{}, fmt.Errorf("patient has not paid the booking fee")
+	}
+
+	createdPrescription, err := ad.adminRepository.CreatePrescription(prescription)
+    if err != nil {
+        return domain.Prescription{}, fmt.Errorf("error creating prescription")
+    }
+
+    return createdPrescription, nil
+}

@@ -26,6 +26,7 @@ const (
 	Admin_MakePaymentRazorpay_FullMethodName = "/admin.Admin/MakePaymentRazorpay"
 	Admin_VerifyPayment_FullMethodName       = "/admin.Admin/VerifyPayment"
 	Admin_GetPaidPatients_FullMethodName     = "/admin.Admin/GetPaidPatients"
+	Admin_CreatePrescription_FullMethodName  = "/admin.Admin/CreatePrescription"
 )
 
 // AdminClient is the client API for Admin service.
@@ -39,6 +40,7 @@ type AdminClient interface {
 	MakePaymentRazorpay(ctx context.Context, in *PaymentReq, opts ...grpc.CallOption) (*PaymentRes, error)
 	VerifyPayment(ctx context.Context, in *PaymentReq, opts ...grpc.CallOption) (*Verifyres, error)
 	GetPaidPatients(ctx context.Context, in *GetPaidPatientsRequest, opts ...grpc.CallOption) (*GetPaidPatientsResponse, error)
+	CreatePrescription(ctx context.Context, in *CreatePrescriptionRequest, opts ...grpc.CallOption) (*CreatePrescriptionResponse, error)
 }
 
 type adminClient struct {
@@ -112,6 +114,15 @@ func (c *adminClient) GetPaidPatients(ctx context.Context, in *GetPaidPatientsRe
 	return out, nil
 }
 
+func (c *adminClient) CreatePrescription(ctx context.Context, in *CreatePrescriptionRequest, opts ...grpc.CallOption) (*CreatePrescriptionResponse, error) {
+	out := new(CreatePrescriptionResponse)
+	err := c.cc.Invoke(ctx, Admin_CreatePrescription_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AdminServer is the server API for Admin service.
 // All implementations must embed UnimplementedAdminServer
 // for forward compatibility
@@ -123,6 +134,7 @@ type AdminServer interface {
 	MakePaymentRazorpay(context.Context, *PaymentReq) (*PaymentRes, error)
 	VerifyPayment(context.Context, *PaymentReq) (*Verifyres, error)
 	GetPaidPatients(context.Context, *GetPaidPatientsRequest) (*GetPaidPatientsResponse, error)
+	CreatePrescription(context.Context, *CreatePrescriptionRequest) (*CreatePrescriptionResponse, error)
 	mustEmbedUnimplementedAdminServer()
 }
 
@@ -150,6 +162,9 @@ func (UnimplementedAdminServer) VerifyPayment(context.Context, *PaymentReq) (*Ve
 }
 func (UnimplementedAdminServer) GetPaidPatients(context.Context, *GetPaidPatientsRequest) (*GetPaidPatientsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetPaidPatients not implemented")
+}
+func (UnimplementedAdminServer) CreatePrescription(context.Context, *CreatePrescriptionRequest) (*CreatePrescriptionResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreatePrescription not implemented")
 }
 func (UnimplementedAdminServer) mustEmbedUnimplementedAdminServer() {}
 
@@ -290,6 +305,24 @@ func _Admin_GetPaidPatients_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Admin_CreatePrescription_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreatePrescriptionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AdminServer).CreatePrescription(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Admin_CreatePrescription_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AdminServer).CreatePrescription(ctx, req.(*CreatePrescriptionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Admin_ServiceDesc is the grpc.ServiceDesc for Admin service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -324,6 +357,10 @@ var Admin_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetPaidPatients",
 			Handler:    _Admin_GetPaidPatients_Handler,
+		},
+		{
+			MethodName: "CreatePrescription",
+			Handler:    _Admin_CreatePrescription_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

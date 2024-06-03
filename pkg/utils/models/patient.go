@@ -7,3 +7,4 @@ type Patient struct {
 	Gender        string
 	Contactnumber string
 }
+
