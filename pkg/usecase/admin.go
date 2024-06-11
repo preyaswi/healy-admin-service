@@ -164,52 +164,47 @@ func (ad *adminUseCase) VerifyPayment(booking_id int) error {
 	}
 }
 
-func (ad *adminUseCase) GetPaidPatients(doctor_id int) ([]models.Patient, error) {
+func (ad *adminUseCase) GetPaidPatients(doctor_id int) ([]models.BookedPatient, error) {
 	bookings, err := ad.adminRepository.GetPaidBookingsByDoctorID(doctor_id)
-	if err != nil {
-		return nil, err
-	}
-	patientChan := make(chan models.Patient)
-	errorChan := make(chan error)
+    if err != nil {
+        return nil, err
+    }
+	bookedPatients := make([]models.BookedPatient, len(bookings))
 	var wg sync.WaitGroup
+	mu := &sync.Mutex{} // Mutex to protect shared resources
+	errors := make([]error, len(bookings))
 
-	for _, booking := range bookings {
+	for i, booking := range bookings {
 		wg.Add(1)
-		go func(patientid int) {
+		go func(i int, booking domain.Booking) {
 			defer wg.Done()
-			patient, err := ad.patientRepository.GetPatientByID(patientid)
-
+			patient, err := ad.patientRepository.GetPatientByID(int(booking.PatientId))
 			if err != nil {
-				errorChan <- err
+				mu.Lock()
+				errors[i] = err
+				mu.Unlock()
 				return
 			}
-			patientChan <- patient
-
-		}(int(booking.PatientId))
+			mu.Lock()
+			bookedPatients[i] = models.BookedPatient{
+				BookingId:     int(booking.BookingId),
+				PaymentStatus: booking.PaymentStatus,
+				Patientdetail: patient,
+			}
+			mu.Unlock()
+		}(i, booking)
 	}
-	go func() {
-		wg.Wait()
-		close(patientChan)
-		close(errorChan)
-	}()
-	var patients []models.Patient
-	for {
-		select {
-		case patient, ok := <-patientChan:
-			if ok {
-				patients = append(patients, patient)
-			}
-		case err, ok := <-errorChan:
-			if ok {
-				return nil, err
-			}
-		}
-		if len(patientChan) == 0 && len(errorChan) == 0 {
-			break
+
+	wg.Wait()
+
+	// Check for errors
+	for _, err := range errors {
+		if err != nil {
+			return nil, fmt.Errorf("error fetching patient details: %v", err)
 		}
 	}
 
-	return patients, nil
+	return bookedPatients, nil
 }
 func (ad *adminUseCase) CreatePrescription(prescription models.PrescriptionRequest) (domain.Prescription, error) {
 	paid, err := ad.adminRepository.CheckPatientPayment(prescription.DoctorID, prescription.PatientID)

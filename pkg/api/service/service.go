@@ -112,23 +112,28 @@ func (ad *AdminServer)VerifyPayment(ctx context.Context,req *pb.PaymentReq) (*pb
 	return &pb.Verifyres{},nil
 }
 func (ad *AdminServer)GetPaidPatients(ctx context.Context,req *pb.GetPaidPatientsRequest) (*pb.GetPaidPatientsResponse, error) {
-	patients,err:=ad.adminUseCase.GetPaidPatients(int(req.DoctorId))
-	if err!=nil{
-		return &pb.GetPaidPatientsResponse{},err
-	}
-	patientdetails:=make([]*pb.Patient,len(patients))
-	for i,patient:=range patients{
-		patientdetails[i]=&pb.Patient{
-			Id:uint32(patient.Id) ,
-			Fullname: patient.Fullname,
-			Email: patient.Email,
-			Gender: patient.Gender,
-			Contactnumber: patient.Contactnumber,
-		}
-	}
-	return &pb.GetPaidPatientsResponse{
-		Patients: patientdetails,
-	},nil
+    bookedPatients, err := ad.adminUseCase.GetPaidPatients(int(req.DoctorId))
+    if err != nil {
+        return &pb.GetPaidPatientsResponse{}, err
+    }
+    pbBookedPatients := make([]*pb.BookedPatient, len(bookedPatients))
+    for i, bp := range bookedPatients {
+        pbBookedPatients[i] = &pb.BookedPatient{
+            BookingId: uint32(bp.BookingId),
+			PaymentStatus: bp.PaymentStatus,
+            PatientDetail: &pb.Patient{
+                Id:            uint32(bp.Patientdetail.Id),
+                Fullname:     bp.Patientdetail.Fullname,
+                Email:        bp.Patientdetail.Email,
+                Gender:       bp.Patientdetail.Gender,
+                Contactnumber: bp.Patientdetail.Contactnumber,
+            },
+        }
+    }
+	
+    return &pb.GetPaidPatientsResponse{
+        BookedPatients: pbBookedPatients,
+    }, nil
 }
 func (ad *AdminServer)CreatePrescription(ctx context.Context,req *pb.CreatePrescriptionRequest) (*pb.CreatePrescriptionResponse, error)  {
 	prescriptionreq:=models.PrescriptionRequest{

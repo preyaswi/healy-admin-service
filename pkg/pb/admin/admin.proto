@@ -83,9 +83,13 @@ message Patient {
   string gender = 4;
   string contactnumber = 5;
 }
-
+message BookedPatient {
+    uint32 booking_id = 1;
+    string payment_status=2;
+    Patient patient_detail = 3;
+}
 message GetPaidPatientsResponse {
-  repeated Patient patients = 1;
+  repeated BookedPatient booked_patients = 1;
 }
 message CreatePrescriptionRequest {
     uint32 booking_id = 1;
