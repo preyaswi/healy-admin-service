@@ -8,7 +8,7 @@ service Patient{
     rpc IndPatientDetails(idreq)returns(PatientDetails){};
 }
 message idreq{
-   int32 user_id=1;
+   string user_id=1;
 }
 message PatientDetails{
    int32 Id             =1;

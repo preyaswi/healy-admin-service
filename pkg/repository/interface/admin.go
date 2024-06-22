@@ -10,7 +10,7 @@ type AdminRepository interface {
 	FindAdminByEmail(admin models.AdminLogin) (models.AdminSignUp, error)
 	CheckAdminExistsByEmail(email string) (*domain.Admin, error)
 
-	AddToBooking(patientid int,doctordetail models.BookingDoctorDetails)error
+	AddToBooking(patientid string,doctordetail models.BookingDoctorDetails)error
 	GetBookingByID(bookingid int)(domain.Booking,error)
 	RemoveBooking(bookingID int) error
 
@@ -18,6 +18,6 @@ type AdminRepository interface {
 	CheckPaymentStatus(bookingid int) (string, error)
 	UpdatePaymentStatus(bookingid int,status string)error
 	GetPaidBookingsByDoctorID(doctorId int)([]domain.Booking,error)
-	CheckPatientPayment(doctorID int, patientID int) (bool, error)
+	CheckPatientPayment(doctorID int, patientID string) (bool, error)
 	CreatePrescription(prescription models.PrescriptionRequest) (domain.Prescription, error)
 }

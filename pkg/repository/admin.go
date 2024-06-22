@@ -48,7 +48,7 @@ func (ad *adminRepository) FindAdminByEmail(admin models.AdminLogin) (models.Adm
 	return user, nil
 }
 
-func (ad *adminRepository) AddToBooking(patientid int, doctordetail models.BookingDoctorDetails) error {
+func (ad *adminRepository) AddToBooking(patientid string, doctordetail models.BookingDoctorDetails) error {
 	err := ad.DB.Exec("insert into bookings(patient_id,doctor_id,doctor_name,doctor_email,fees)values(?,?,?,?,?)", patientid, doctordetail.Doctorid, doctordetail.DoctorName, doctordetail.DoctorEmail, doctordetail.Fees).Error
 	if err != nil {
 		return err
@@ -103,7 +103,7 @@ func (ad *adminRepository) GetPaidBookingsByDoctorID(doctorId int) ([]domain.Boo
 	}
 	return bookings, nil
 }
-func (ad *adminRepository) CheckPatientPayment(doctorID int, patientID int) (bool, error) {
+func (ad *adminRepository) CheckPatientPayment(doctorID int, patientID string) (bool, error) {
     var booking domain.Booking
     err := ad.DB.Where("doctor_id = ? AND patient_id = ? AND payment_status = ?", doctorID, patientID, "paid").First(&booking).Error
     if err != nil {
@@ -120,7 +120,7 @@ func (ad *adminRepository) CreatePrescription(prescription models.PrescriptionRe
     prescriptionModel :=domain.Prescription{
         BookingID: uint(prescription.BookingID),
         DoctorID:  uint(prescription.DoctorID),
-        PatientID: uint(prescription.PatientID),
+        PatientID:prescription.PatientID,
         Medicine:  prescription.Medicine,
         Dosage:    prescription.Dosage,
         Notes:     prescription.Notes,

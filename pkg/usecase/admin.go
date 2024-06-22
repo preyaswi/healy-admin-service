@@ -95,7 +95,7 @@ func (ad *adminUseCase) LoginHandler(admin models.AdminLogin) (*domain.TokenAdmi
 		Token: tokenString,
 	}, nil
 }
-func (ad *adminUseCase) AddToBooking(patientid, doctorid int) error {
+func (ad *adminUseCase) AddToBooking(patientid string, doctorid int) error {
 	ok, err := ad.doctorRepository.CheckDoctor(doctorid)
 	if err != nil {
 		return err
@@ -114,12 +114,12 @@ func (ad *adminUseCase) AddToBooking(patientid, doctorid int) error {
 	return nil
 
 }
-func (ad *adminUseCase) CancelBooking(patientid, bookingid int) error {
+func (ad *adminUseCase) CancelBooking(patientid string, bookingid int) error {
 	booking, err := ad.adminRepository.GetBookingByID(bookingid)
 	if err != nil {
 		return err
 	}
-	if booking.PatientId != uint(patientid) {
+	if booking.PatientId != patientid {
 		return errors.New("unauthorized: patient ID does not match booking")
 	}
 	return ad.adminRepository.RemoveBooking(bookingid)
@@ -178,7 +178,7 @@ func (ad *adminUseCase) GetPaidPatients(doctor_id int) ([]models.BookedPatient, 
 		wg.Add(1)
 		go func(i int, booking domain.Booking) {
 			defer wg.Done()
-			patient, err := ad.patientRepository.GetPatientByID(int(booking.PatientId))
+			patient, err := ad.patientRepository.GetPatientByID(booking.PatientId)
 			if err != nil {
 				mu.Lock()
 				errors[i] = err

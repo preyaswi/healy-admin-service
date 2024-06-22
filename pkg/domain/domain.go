@@ -16,7 +16,7 @@ type TokenAdmin struct {
 
 type Booking struct {
 	BookingId     uint   `json:"booking_id" gorm:"primaryKey;not null"`
-	PatientId     uint   `json:"patient_id" gorm:"not null"`
+	PatientId     string   `json:"patient_id" gorm:"not null"`
 	DoctorId      uint   `json:"doctor_id" gorm:"not null"`
 	DoctorName    string `json:"doctor_name" gorm:"not null"`
 	DoctorEmail   string `json:"doctor_email" gorm:"not null"`
@@ -35,7 +35,7 @@ type Prescription struct {
     ID        uint   `json:"id" gorm:"primaryKey;autoIncrement"`
     BookingID uint   `json:"booking_id" gorm:"not null"`
     DoctorID  uint   `json:"doctor_id" gorm:"not null"`
-    PatientID uint   `json:"patient_id" gorm:"not null"`
+    PatientID string   `json:"patient_id" gorm:"not null"`
     Medicine  string `json:"medicine" gorm:"not null"`
     Dosage    string `json:"dosage" gorm:"not null"`
     Notes     string `json:"notes"`

@@ -47,11 +47,11 @@ message AdminLoginResponse{
     string token=3;
 }
 message bookingreq{
-   int32 patient_id=1;
+   string patient_id=1;
    int32 doctor_id=2;
 }
 message canbookingreq{
-     int32 patient_id=1;
+    string patient_id=1;
    int32 booking_id=2;
 }
 message bookingres{}
@@ -59,8 +59,8 @@ message paymentReq{
  uint32 booking_id=1;
 }
 message PaymentDetails {
-    uint32 booking_id =1;
-  uint32 patient_id = 2;
+  uint32 booking_id =1;
+  string patient_id = 2;
   uint32 doctor_id = 3;
   string doctor_name=4;
   string doctor_email=5;
@@ -94,7 +94,7 @@ message GetPaidPatientsResponse {
 message CreatePrescriptionRequest {
     uint32 booking_id = 1;
     uint32 doctor_id = 2;
-    uint32 patient_id = 3;
+    string patient_id = 3;
     string medicine = 4;
     string dosage = 5;
     string notes = 6;
@@ -104,7 +104,7 @@ message CreatePrescriptionResponse {
     uint32 id = 1;
     uint32 booking_id = 2;
     uint32 doctor_id = 3;
-    uint32 patient_id = 4;
+    string patient_id = 4;
     string medicine = 5;
     string dosage = 6;
     string notes = 7;

@@ -26,8 +26,8 @@ func NewPatientClient(cfg *config.Config) *patientClient {
 
 }
 
-func (c *patientClient) GetPatientByID(patientid int) (models.Patient, error) {
-	res, err := c.Client.IndPatientDetails(context.Background(),&pbpa.Idreq{UserId: int32(patientid)})
+func (c *patientClient) GetPatientByID(patientid string) (models.Patient, error) {
+	res, err := c.Client.IndPatientDetails(context.Background(),&pbpa.Idreq{UserId: patientid})
 	if err != nil {
 		return models.Patient{}, err
 	}

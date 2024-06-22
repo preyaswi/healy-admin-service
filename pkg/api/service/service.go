@@ -66,14 +66,14 @@ func (ad *AdminServer) AdminLogin(ctx context.Context, Req *pb.AdminLoginInReque
 	}, nil
 }
 func (ad *AdminServer)AddTobookings(ctx context.Context,req *pb.Bookingreq) (*pb.Bookingres, error)  {
-	err:=ad.adminUseCase.AddToBooking(int(req.PatientId),int(req.DoctorId))
+	err:=ad.adminUseCase.AddToBooking(req.PatientId,int(req.DoctorId))
 	if err!=nil{
 		return &pb.Bookingres{},err
 	}
 	return &pb.Bookingres{},nil
 }
 func (ad *AdminServer)CancelBookings(ctx context.Context,req  *pb.Canbookingreq) (*pb.Bookingres, error)  {
-	err:=ad.adminUseCase.CancelBooking(int(req.PatientId),int(req.BookingId))
+	err:=ad.adminUseCase.CancelBooking(req.PatientId,int(req.BookingId))
 	if err!=nil{
 		return &pb.Bookingres{},err
 	}
@@ -89,7 +89,7 @@ func (ad *AdminServer)MakePaymentRazorpay(ctx context.Context,req *pb.PaymentReq
 	}
 	paymentDetail:=&pb.PaymentDetails{
 		BookingId: uint32(paymentDetails.BookingId),
-		PatientId: uint32(paymentDetails.PatientId),
+		PatientId: paymentDetails.PatientId,
 		DoctorId: uint32(paymentDetails.DoctorId),
 		DoctorName: paymentDetails.DoctorName,
 		DoctorEmail: paymentDetails.DoctorEmail,
@@ -138,7 +138,7 @@ func (ad *AdminServer)GetPaidPatients(ctx context.Context,req *pb.GetPaidPatient
 func (ad *AdminServer)CreatePrescription(ctx context.Context,req *pb.CreatePrescriptionRequest) (*pb.CreatePrescriptionResponse, error)  {
 	prescriptionreq:=models.PrescriptionRequest{
 		DoctorID: int(req.DoctorId),
-		PatientID: int(req.PatientId),
+		PatientID:req.PatientId,
 		BookingID: int(req.BookingId),
 		Medicine: req.Medicine,
 		Dosage: req.Dosage,
@@ -152,7 +152,7 @@ func (ad *AdminServer)CreatePrescription(ctx context.Context,req *pb.CreatePresc
 		Id: uint32(prescription.ID),
 		BookingId: uint32(prescription.BookingID),
 		DoctorId: uint32(prescription.DoctorID),
-		PatientId: uint32(prescription.PatientID),
+		PatientId: prescription.PatientID,
 		Medicine: prescription.Medicine,
 		Dosage: prescription.Dosage,
 		Notes: prescription.Notes,
