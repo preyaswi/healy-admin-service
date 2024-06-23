@@ -18,6 +18,8 @@ service Admin{
     rpc CreatePrescription(CreatePrescriptionRequest) returns (CreatePrescriptionResponse);
 
     rpc SetDoctorAvailability(SetDoctorAvailabilityRequest) returns (SetDoctorAvailabilityResponse);
+    rpc GetDoctorAvailability(GetDoctorAvailabilityRequest)returns (GetDoctorAvailabilityResponse);
+    
     
 }
 message AdminSignupRequest{
@@ -121,4 +123,18 @@ message SetDoctorAvailabilityRequest {
 
 message SetDoctorAvailabilityResponse {
     string status = 1;
+}
+message GetDoctorAvailabilityRequest {
+    uint32 doctor_id = 1;
+    string date = 2; // e.g., "2024-06-20"
+}
+
+message Slot {
+    uint32 slot_id = 1;
+    string time = 2; // e.g., "09:00-09:30"
+    bool is_booked = 3;
+}
+
+message GetDoctorAvailabilityResponse {
+    repeated Slot slots = 1;
 }

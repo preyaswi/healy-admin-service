@@ -177,3 +177,23 @@ func (ad *AdminServer) SetDoctorAvailability(ctx context.Context, req *pb.SetDoc
 	}, nil
 
 }
+func (ad *AdminServer) GetDoctorAvailability(ctx context.Context, req *pb.GetDoctorAvailabilityRequest) (*pb.GetDoctorAvailabilityResponse, error) {
+	doctorId := req.DoctorId
+	date, _ := time.Parse("2006-01-02", req.Date)
+	slots,err:=ad.adminUseCase.GetDoctorAvailability(int(doctorId),date)
+	if err!=nil{
+		return &pb.GetDoctorAvailabilityResponse{},nil
+	}
+	var pbSlots []*pb.Slot
+    for _, slot := range slots {
+        pbSlots = append(pbSlots, &pb.Slot{
+            SlotId:   uint32(slot.Slot_id),
+            Time:     slot.Time,
+            IsBooked: slot.IsBooked,
+        })
+    }
+	return &pb.GetDoctorAvailabilityResponse{
+        Slots: pbSlots,
+    }, nil
+
+}

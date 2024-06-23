@@ -3,6 +3,7 @@ package interfaces
 import (
 	"healy-admin/pkg/domain"
 	"healy-admin/pkg/utils/models"
+	"time"
 )
 
 type AdminUseCase interface {
@@ -16,4 +17,5 @@ type AdminUseCase interface {
 	CreatePrescription(prescription models.PrescriptionRequest) (domain.Prescription, error)
 
 	SetDoctorAvailability(availabiity models.SetAvailability)(string,error)
+	GetDoctorAvailability(dotctorid int,date time.Time)([]models.AvailableSlots,error)
 }

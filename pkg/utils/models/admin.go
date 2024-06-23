@@ -42,3 +42,8 @@ type SetAvailability struct{
 	StartTime  time.Time 
 	EndTime time.Time 
 }
+type AvailableSlots struct{
+	Slot_id int
+	Time string
+	IsBooked bool
+}

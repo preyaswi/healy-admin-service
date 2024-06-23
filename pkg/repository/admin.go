@@ -157,3 +157,18 @@ func (ad *adminRepository) SetDoctorAvailability(availabiity models.SetAvailabil
 	}
 	return "success", nil
 }
+func (ad *adminRepository)GetDoctorAvailability(doctor_id int,date time.Time)([]models.AvailableSlots,error)  {
+	var slots []domain.Availability
+	if err:=ad.DB.Where("doctor_id = ? AND date = ?", doctor_id, date).Find(&slots).Error;err!=nil{
+		return []models.AvailableSlots{},err
+	}
+	var newslots []models.AvailableSlots
+	for _,slot:=range slots{
+		newslots = append(newslots, models.AvailableSlots{
+			Slot_id: int(slot.ID),
+			Time: fmt.Sprintf("%s-%s",slot.StartTime.Format("15:04"),slot.EndTime.Format("15:04")),
+			IsBooked: slot.IsBooked,
+		})
+	}
+	return newslots,nil
+}

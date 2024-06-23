@@ -3,6 +3,7 @@ package interfaces
 import (
 	"healy-admin/pkg/domain"
 	"healy-admin/pkg/utils/models"
+	"time"
 )
 
 type AdminRepository interface {
@@ -22,4 +23,5 @@ type AdminRepository interface {
 	CreatePrescription(prescription models.PrescriptionRequest) (domain.Prescription, error)
 
 	SetDoctorAvailability(availabiity models.SetAvailability)(string,error)
+	GetDoctorAvailability(doctor_id int,date time.Time)([]models.AvailableSlots,error)
 }

@@ -12,6 +12,7 @@ import (
 	"healy-admin/pkg/utils/models"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/jinzhu/copier"
 	"github.com/razorpay/razorpay-go"
@@ -166,9 +167,9 @@ func (ad *adminUseCase) VerifyPayment(booking_id int) error {
 
 func (ad *adminUseCase) GetPaidPatients(doctor_id int) ([]models.BookedPatient, error) {
 	bookings, err := ad.adminRepository.GetPaidBookingsByDoctorID(doctor_id)
-    if err != nil {
-        return nil, err
-    }
+	if err != nil {
+		return nil, err
+	}
 	bookedPatients := make([]models.BookedPatient, len(bookings))
 	var wg sync.WaitGroup
 	mu := &sync.Mutex{} // Mutex to protect shared resources
@@ -217,16 +218,23 @@ func (ad *adminUseCase) CreatePrescription(prescription models.PrescriptionReque
 	}
 
 	createdPrescription, err := ad.adminRepository.CreatePrescription(prescription)
-    if err != nil {
-        return domain.Prescription{}, fmt.Errorf("error creating prescription")
-    }
-
-    return createdPrescription, nil
-}
-func (ad *adminUseCase)SetDoctorAvailability(availabiity models.SetAvailability)(string,error){
-	status,err:=ad.adminRepository.SetDoctorAvailability(availabiity)
-	if err!=nil{
-		return "",err
+	if err != nil {
+		return domain.Prescription{}, fmt.Errorf("error creating prescription")
 	}
-	return status,nil
+
+	return createdPrescription, nil
+}
+func (ad *adminUseCase) SetDoctorAvailability(availabiity models.SetAvailability) (string, error) {
+	status, err := ad.adminRepository.SetDoctorAvailability(availabiity)
+	if err != nil {
+		return "", err
+	}
+	return status, nil
+}
+func (ad *adminUseCase) GetDoctorAvailability(dotctorid int, date time.Time) ([]models.AvailableSlots, error) {
+ availableSlots,err:=ad.adminRepository.GetDoctorAvailability(dotctorid,date)
+ if err!=nil{
+	return []models.AvailableSlots{},err
+ }
+ return availableSlots,nil
 }
