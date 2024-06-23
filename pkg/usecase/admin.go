@@ -208,7 +208,7 @@ func (ad *adminUseCase) GetPaidPatients(doctor_id int) ([]models.BookedPatient, 
 	return bookedPatients, nil
 }
 func (ad *adminUseCase) CreatePrescription(prescription models.PrescriptionRequest) (domain.Prescription, error) {
-	paid, err := ad.adminRepository.CheckPatientPayment(prescription.DoctorID, prescription.PatientID)
+	paid, err := ad.adminRepository.CheckPatientPayment(prescription.PatientID,prescription.BookingID)
 	if err != nil {
 		return domain.Prescription{}, fmt.Errorf("error checking payment status")
 	}
@@ -232,9 +232,40 @@ func (ad *adminUseCase) SetDoctorAvailability(availabiity models.SetAvailability
 	return status, nil
 }
 func (ad *adminUseCase) GetDoctorAvailability(dotctorid int, date time.Time) ([]models.AvailableSlots, error) {
- availableSlots,err:=ad.adminRepository.GetDoctorAvailability(dotctorid,date)
- if err!=nil{
-	return []models.AvailableSlots{},err
- }
- return availableSlots,nil
+	availableSlots, err := ad.adminRepository.GetDoctorAvailability(dotctorid, date)
+	if err != nil {
+		return []models.AvailableSlots{}, err
+	}
+	return availableSlots, nil
+}
+func (ad *adminUseCase) BookSlot(patientid string ,bookingid,slotid int)error {
+	paid, err := ad.adminRepository.CheckPatientPayment(patientid,bookingid)
+	if err != nil {
+		return  errors.New("error checking payment status")
+	}
+
+	if !paid {
+		return  errors.New("patient has not paid the booking fee")
+	}
+	slotAvailable, err := ad.adminRepository.CheckSlotAvailability(slotid)
+    if err != nil {
+        return err
+    }
+    if !slotAvailable {
+        return errors.New("slot is already booked")
+    }
+    // Book the slot
+    err = ad.adminRepository.BookSlot(bookingid, slotid)
+    if err != nil {
+        return err
+    }
+
+    // Mark slot as booked
+    err = ad.adminRepository.MarkSlotAsBooked(slotid)
+    if err != nil {
+        return err
+    }
+
+    return nil
+
 }

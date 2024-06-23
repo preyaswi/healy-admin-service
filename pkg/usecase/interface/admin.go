@@ -18,4 +18,6 @@ type AdminUseCase interface {
 
 	SetDoctorAvailability(availabiity models.SetAvailability)(string,error)
 	GetDoctorAvailability(dotctorid int,date time.Time)([]models.AvailableSlots,error)
+
+	BookSlot(patientid string ,bookingid,slotid int)error
 }

@@ -27,6 +27,7 @@ type Booking struct {
 	DoctorEmail   string `json:"doctor_email" gorm:"not null"`
 	Fees          uint64 `json:"fees" gorm:"not null"`
 	PaymentStatus string `json:"payment_status" gorm:"default:'not paid'"`
+	Slot_id       uint   `json:"slot_id"`
 }
 
 type RazerPay struct {

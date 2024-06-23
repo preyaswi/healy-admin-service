@@ -180,20 +180,27 @@ func (ad *AdminServer) SetDoctorAvailability(ctx context.Context, req *pb.SetDoc
 func (ad *AdminServer) GetDoctorAvailability(ctx context.Context, req *pb.GetDoctorAvailabilityRequest) (*pb.GetDoctorAvailabilityResponse, error) {
 	doctorId := req.DoctorId
 	date, _ := time.Parse("2006-01-02", req.Date)
-	slots,err:=ad.adminUseCase.GetDoctorAvailability(int(doctorId),date)
-	if err!=nil{
-		return &pb.GetDoctorAvailabilityResponse{},nil
+	slots, err := ad.adminUseCase.GetDoctorAvailability(int(doctorId), date)
+	if err != nil {
+		return &pb.GetDoctorAvailabilityResponse{}, nil
 	}
 	var pbSlots []*pb.Slot
-    for _, slot := range slots {
-        pbSlots = append(pbSlots, &pb.Slot{
-            SlotId:   uint32(slot.Slot_id),
-            Time:     slot.Time,
-            IsBooked: slot.IsBooked,
-        })
-    }
+	for _, slot := range slots {
+		pbSlots = append(pbSlots, &pb.Slot{
+			SlotId:   uint32(slot.Slot_id),
+			Time:     slot.Time,
+			IsBooked: slot.IsBooked,
+		})
+	}
 	return &pb.GetDoctorAvailabilityResponse{
-        Slots: pbSlots,
-    }, nil
+		Slots: pbSlots,
+	}, nil
 
+}
+func (ad *AdminServer) BookSlot(ctx context.Context, req *pb.BookSlotreq) (*pb.BookSlotres, error) {
+	err := ad.adminUseCase.BookSlot(req.PatientId, int(req.BookingId), int(req.SlotId))
+	if err != nil {
+		return &pb.BookSlotres{}, err
+	}
+	return &pb.BookSlotres{}, nil
 }

@@ -29,6 +29,7 @@ const (
 	Admin_CreatePrescription_FullMethodName    = "/admin.Admin/CreatePrescription"
 	Admin_SetDoctorAvailability_FullMethodName = "/admin.Admin/SetDoctorAvailability"
 	Admin_GetDoctorAvailability_FullMethodName = "/admin.Admin/GetDoctorAvailability"
+	Admin_BookSlot_FullMethodName              = "/admin.Admin/BookSlot"
 )
 
 // AdminClient is the client API for Admin service.
@@ -45,6 +46,7 @@ type AdminClient interface {
 	CreatePrescription(ctx context.Context, in *CreatePrescriptionRequest, opts ...grpc.CallOption) (*CreatePrescriptionResponse, error)
 	SetDoctorAvailability(ctx context.Context, in *SetDoctorAvailabilityRequest, opts ...grpc.CallOption) (*SetDoctorAvailabilityResponse, error)
 	GetDoctorAvailability(ctx context.Context, in *GetDoctorAvailabilityRequest, opts ...grpc.CallOption) (*GetDoctorAvailabilityResponse, error)
+	BookSlot(ctx context.Context, in *BookSlotreq, opts ...grpc.CallOption) (*BookSlotres, error)
 }
 
 type adminClient struct {
@@ -145,6 +147,15 @@ func (c *adminClient) GetDoctorAvailability(ctx context.Context, in *GetDoctorAv
 	return out, nil
 }
 
+func (c *adminClient) BookSlot(ctx context.Context, in *BookSlotreq, opts ...grpc.CallOption) (*BookSlotres, error) {
+	out := new(BookSlotres)
+	err := c.cc.Invoke(ctx, Admin_BookSlot_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AdminServer is the server API for Admin service.
 // All implementations must embed UnimplementedAdminServer
 // for forward compatibility
@@ -159,6 +170,7 @@ type AdminServer interface {
 	CreatePrescription(context.Context, *CreatePrescriptionRequest) (*CreatePrescriptionResponse, error)
 	SetDoctorAvailability(context.Context, *SetDoctorAvailabilityRequest) (*SetDoctorAvailabilityResponse, error)
 	GetDoctorAvailability(context.Context, *GetDoctorAvailabilityRequest) (*GetDoctorAvailabilityResponse, error)
+	BookSlot(context.Context, *BookSlotreq) (*BookSlotres, error)
 	mustEmbedUnimplementedAdminServer()
 }
 
@@ -195,6 +207,9 @@ func (UnimplementedAdminServer) SetDoctorAvailability(context.Context, *SetDocto
 }
 func (UnimplementedAdminServer) GetDoctorAvailability(context.Context, *GetDoctorAvailabilityRequest) (*GetDoctorAvailabilityResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetDoctorAvailability not implemented")
+}
+func (UnimplementedAdminServer) BookSlot(context.Context, *BookSlotreq) (*BookSlotres, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method BookSlot not implemented")
 }
 func (UnimplementedAdminServer) mustEmbedUnimplementedAdminServer() {}
 
@@ -389,6 +404,24 @@ func _Admin_GetDoctorAvailability_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Admin_BookSlot_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BookSlotreq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AdminServer).BookSlot(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Admin_BookSlot_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AdminServer).BookSlot(ctx, req.(*BookSlotreq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Admin_ServiceDesc is the grpc.ServiceDesc for Admin service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -435,6 +468,10 @@ var Admin_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetDoctorAvailability",
 			Handler:    _Admin_GetDoctorAvailability_Handler,
+		},
+		{
+			MethodName: "BookSlot",
+			Handler:    _Admin_BookSlot_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

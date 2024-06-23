@@ -19,6 +19,8 @@ service Admin{
 
     rpc SetDoctorAvailability(SetDoctorAvailabilityRequest) returns (SetDoctorAvailabilityResponse);
     rpc GetDoctorAvailability(GetDoctorAvailabilityRequest)returns (GetDoctorAvailabilityResponse);
+
+    rpc BookSlot(BookSlotreq)returns(BookSlotres);
     
     
 }
@@ -138,3 +140,9 @@ message Slot {
 message GetDoctorAvailabilityResponse {
     repeated Slot slots = 1;
 }
+message BookSlotreq{
+ uint32 booking_id=1;
+ string patient_id=2;
+ uint32 slot_id=3;
+}
+message BookSlotres{}

@@ -104,9 +104,9 @@ func (ad *adminRepository) GetPaidBookingsByDoctorID(doctorId int) ([]domain.Boo
 	}
 	return bookings, nil
 }
-func (ad *adminRepository) CheckPatientPayment(doctorID int, patientID string) (bool, error) {
+func (ad *adminRepository) CheckPatientPayment(patientid string,bookingid int) (bool, error){
 	var booking domain.Booking
-	err := ad.DB.Where("doctor_id = ? AND patient_id = ? AND payment_status = ?", doctorID, patientID, "paid").First(&booking).Error
+	err := ad.DB.Where("patient_id = ? AND booking_id=? AND payment_status = ?",patientid,bookingid, "paid").First(&booking).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return false, nil
@@ -174,7 +174,7 @@ func (ad *adminRepository) SetDoctorAvailability(availability models.SetAvailabi
 	if len(slots) == 0 {
 		return "", errors.New("no available slots to be added")
 	}
-	
+
 	// Save the non-overlapping slots to the database
 	if err := ad.DB.Create(&slots).Error; err != nil {
 		return "", err
@@ -196,4 +196,30 @@ func (ad *adminRepository)GetDoctorAvailability(doctor_id int,date time.Time)([]
 		})
 	}
 	return newslots,nil
+}
+func (ad *adminRepository) CheckSlotAvailability(slotid int) (bool, error) {
+    var slot domain.Availability
+    err := ad.DB.Where("id = ? AND is_booked = ?", slotid, false).First(&slot).Error
+    if err != nil {
+        if errors.Is(err, gorm.ErrRecordNotFound) {
+            return false, nil
+        }
+        return false, err
+    }
+    return true, nil
+}
+func (ad *adminRepository) BookSlot(bookingid, slotid int) error {
+    err := ad.DB.Exec("UPDATE bookings SET slot_id = ? WHERE booking_id = ?", slotid, bookingid).Error
+    if err != nil {
+        return err
+    }
+    return nil
+}
+
+func (ad *adminRepository) MarkSlotAsBooked(slotid int) error {
+    err := ad.DB.Model(&domain.Availability{}).Where("id = ?", slotid).Update("is_booked", true).Error
+    if err != nil {
+        return err
+    }
+    return nil
 }

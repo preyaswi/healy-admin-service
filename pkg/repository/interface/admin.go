@@ -19,9 +19,12 @@ type AdminRepository interface {
 	CheckPaymentStatus(bookingid int) (string, error)
 	UpdatePaymentStatus(bookingid int,status string)error
 	GetPaidBookingsByDoctorID(doctorId int)([]domain.Booking,error)
-	CheckPatientPayment(doctorID int, patientID string) (bool, error)
+	CheckPatientPayment(patientid string,bookingid int) (bool, error)
 	CreatePrescription(prescription models.PrescriptionRequest) (domain.Prescription, error)
 
 	SetDoctorAvailability(availabiity models.SetAvailability)(string,error)
 	GetDoctorAvailability(doctor_id int,date time.Time)([]models.AvailableSlots,error)
+	CheckSlotAvailability(slotid int)(bool,error)
+	BookSlot(bookingid, slotid int) error
+	MarkSlotAsBooked(slotid int) error
 }
