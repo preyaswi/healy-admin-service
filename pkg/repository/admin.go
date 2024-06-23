@@ -139,23 +139,48 @@ func (ad *adminRepository) CreatePrescription(prescription models.PrescriptionRe
 
 	return createdPrescription, nil
 }
-func (ad *adminRepository) SetDoctorAvailability(availabiity models.SetAvailability) (string, error) {
+func (ad *adminRepository) SetDoctorAvailability(availability models.SetAvailability) (string, error) {
 	var slots []domain.Availability
-	currentTime := availabiity.StartTime
-	for currentTime.Before(availabiity.EndTime) {
-		slots = append(slots, domain.Availability{
-			DoctorID:  uint(availabiity.DoctorId),
-			Date:      availabiity.Date,
-			StartTime: currentTime,
-			EndTime:   currentTime.Add(30 * time.Minute),
-			IsBooked:  false,
-		})
-		currentTime = currentTime.Add(30 * time.Minute)
+	currentTime := availability.StartTime
+	for currentTime.Before(availability.EndTime) {
+		// Define the end time for the current slot
+		slotEndTime := currentTime.Add(30 * time.Minute)
+
+		// Check for overlapping slots
+		var existingSlots []domain.Availability
+		err := ad.DB.Where("doctor_id = ? AND date = ? AND ((start_time < ? AND end_time > ?) OR (start_time < ? AND end_time > ?) OR (start_time >= ? AND end_time <= ?))",
+			availability.DoctorId, availability.Date, slotEndTime, currentTime, currentTime, slotEndTime, currentTime, slotEndTime).Find(&existingSlots).Error
+
+		if err != nil {
+			return "", err
+		}
+
+		// If no overlapping slots found, add the new slot to the list
+		if len(existingSlots) == 0 {
+			slots = append(slots, domain.Availability{
+				DoctorID:  uint(availability.DoctorId),
+				Date:      availability.Date,
+				StartTime: currentTime,
+				EndTime:   slotEndTime,
+				IsBooked:  false,
+			})
+		}
+
+		// Move to the next 30-minute slot
+		currentTime = slotEndTime
 	}
+
+	// Check if there are slots to be inserted
+	if len(slots) == 0 {
+		return "", errors.New("no available slots to be added")
+	}
+	
+	// Save the non-overlapping slots to the database
 	if err := ad.DB.Create(&slots).Error; err != nil {
 		return "", err
 	}
 	return "success", nil
+
 }
 func (ad *adminRepository)GetDoctorAvailability(doctor_id int,date time.Time)([]models.AvailableSlots,error)  {
 	var slots []domain.Availability
