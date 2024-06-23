@@ -16,6 +16,8 @@ service Admin{
 
     rpc GetPaidPatients(GetPaidPatientsRequest)returns(GetPaidPatientsResponse){};
     rpc CreatePrescription(CreatePrescriptionRequest) returns (CreatePrescriptionResponse);
+
+    rpc SetDoctorAvailability(SetDoctorAvailabilityRequest) returns (SetDoctorAvailabilityResponse);
     
 }
 message AdminSignupRequest{
@@ -108,4 +110,15 @@ message CreatePrescriptionResponse {
     string medicine = 5;
     string dosage = 6;
     string notes = 7;
+}
+
+message SetDoctorAvailabilityRequest {
+    uint32 doctor_id = 1;
+    string date = 2; // e.g., "2024-06-20"
+    string start_time = 3; // e.g., "09:00"
+    string end_time = 4; // e.g., "17:00"
+}
+
+message SetDoctorAvailabilityResponse {
+    string status = 1;
 }

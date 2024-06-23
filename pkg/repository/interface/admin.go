@@ -20,4 +20,6 @@ type AdminRepository interface {
 	GetPaidBookingsByDoctorID(doctorId int)([]domain.Booking,error)
 	CheckPatientPayment(doctorID int, patientID string) (bool, error)
 	CreatePrescription(prescription models.PrescriptionRequest) (domain.Prescription, error)
+
+	SetDoctorAvailability(availabiity models.SetAvailability)(string,error)
 }

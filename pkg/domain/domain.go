@@ -1,6 +1,11 @@
 package domain
 
-import "healy-admin/pkg/utils/models"
+import (
+	"healy-admin/pkg/utils/models"
+	"time"
+
+	"gorm.io/gorm"
+)
 
 type Admin struct {
 	ID        uint   `json:"id" gorm:"uniquekey; not null"`
@@ -16,14 +21,13 @@ type TokenAdmin struct {
 
 type Booking struct {
 	BookingId     uint   `json:"booking_id" gorm:"primaryKey;not null"`
-	PatientId     string   `json:"patient_id" gorm:"not null"`
+	PatientId     string `json:"patient_id" gorm:"not null"`
 	DoctorId      uint   `json:"doctor_id" gorm:"not null"`
 	DoctorName    string `json:"doctor_name" gorm:"not null"`
 	DoctorEmail   string `json:"doctor_email" gorm:"not null"`
 	Fees          uint64 `json:"fees" gorm:"not null"`
 	PaymentStatus string `json:"payment_status" gorm:"default:'not paid'"`
 }
-
 
 type RazerPay struct {
 	ID        uint    `json:"id" gorm:"primaryKey;not null"`
@@ -32,11 +36,20 @@ type RazerPay struct {
 	Booking   Booking `json:"-" gorm:"foreignKey:BookingID;references:BookingId"`
 }
 type Prescription struct {
-    ID        uint   `json:"id" gorm:"primaryKey;autoIncrement"`
-    BookingID uint   `json:"booking_id" gorm:"not null"`
-    DoctorID  uint   `json:"doctor_id" gorm:"not null"`
-    PatientID string   `json:"patient_id" gorm:"not null"`
-    Medicine  string `json:"medicine" gorm:"not null"`
-    Dosage    string `json:"dosage" gorm:"not null"`
-    Notes     string `json:"notes"`
+	ID        uint   `json:"id" gorm:"primaryKey;autoIncrement"`
+	BookingID uint   `json:"booking_id" gorm:"not null"`
+	DoctorID  uint   `json:"doctor_id" gorm:"not null"`
+	PatientID string `json:"patient_id" gorm:"not null"`
+	Medicine  string `json:"medicine" gorm:"not null"`
+	Dosage    string `json:"dosage" gorm:"not null"`
+	Notes     string `json:"notes"`
+}
+
+type Availability struct {
+	gorm.Model
+	DoctorID  uint
+	Date      time.Time
+	StartTime time.Time
+	EndTime   time.Time
+	IsBooked  bool
 }

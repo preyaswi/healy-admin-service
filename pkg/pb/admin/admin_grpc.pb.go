@@ -19,14 +19,15 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	Admin_AdminSignup_FullMethodName         = "/admin.Admin/AdminSignup"
-	Admin_AdminLogin_FullMethodName          = "/admin.Admin/AdminLogin"
-	Admin_AddTobookings_FullMethodName       = "/admin.Admin/AddTobookings"
-	Admin_CancelBookings_FullMethodName      = "/admin.Admin/CancelBookings"
-	Admin_MakePaymentRazorpay_FullMethodName = "/admin.Admin/MakePaymentRazorpay"
-	Admin_VerifyPayment_FullMethodName       = "/admin.Admin/VerifyPayment"
-	Admin_GetPaidPatients_FullMethodName     = "/admin.Admin/GetPaidPatients"
-	Admin_CreatePrescription_FullMethodName  = "/admin.Admin/CreatePrescription"
+	Admin_AdminSignup_FullMethodName           = "/admin.Admin/AdminSignup"
+	Admin_AdminLogin_FullMethodName            = "/admin.Admin/AdminLogin"
+	Admin_AddTobookings_FullMethodName         = "/admin.Admin/AddTobookings"
+	Admin_CancelBookings_FullMethodName        = "/admin.Admin/CancelBookings"
+	Admin_MakePaymentRazorpay_FullMethodName   = "/admin.Admin/MakePaymentRazorpay"
+	Admin_VerifyPayment_FullMethodName         = "/admin.Admin/VerifyPayment"
+	Admin_GetPaidPatients_FullMethodName       = "/admin.Admin/GetPaidPatients"
+	Admin_CreatePrescription_FullMethodName    = "/admin.Admin/CreatePrescription"
+	Admin_SetDoctorAvailability_FullMethodName = "/admin.Admin/SetDoctorAvailability"
 )
 
 // AdminClient is the client API for Admin service.
@@ -41,6 +42,7 @@ type AdminClient interface {
 	VerifyPayment(ctx context.Context, in *PaymentReq, opts ...grpc.CallOption) (*Verifyres, error)
 	GetPaidPatients(ctx context.Context, in *GetPaidPatientsRequest, opts ...grpc.CallOption) (*GetPaidPatientsResponse, error)
 	CreatePrescription(ctx context.Context, in *CreatePrescriptionRequest, opts ...grpc.CallOption) (*CreatePrescriptionResponse, error)
+	SetDoctorAvailability(ctx context.Context, in *SetDoctorAvailabilityRequest, opts ...grpc.CallOption) (*SetDoctorAvailabilityResponse, error)
 }
 
 type adminClient struct {
@@ -123,6 +125,15 @@ func (c *adminClient) CreatePrescription(ctx context.Context, in *CreatePrescrip
 	return out, nil
 }
 
+func (c *adminClient) SetDoctorAvailability(ctx context.Context, in *SetDoctorAvailabilityRequest, opts ...grpc.CallOption) (*SetDoctorAvailabilityResponse, error) {
+	out := new(SetDoctorAvailabilityResponse)
+	err := c.cc.Invoke(ctx, Admin_SetDoctorAvailability_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AdminServer is the server API for Admin service.
 // All implementations must embed UnimplementedAdminServer
 // for forward compatibility
@@ -135,6 +146,7 @@ type AdminServer interface {
 	VerifyPayment(context.Context, *PaymentReq) (*Verifyres, error)
 	GetPaidPatients(context.Context, *GetPaidPatientsRequest) (*GetPaidPatientsResponse, error)
 	CreatePrescription(context.Context, *CreatePrescriptionRequest) (*CreatePrescriptionResponse, error)
+	SetDoctorAvailability(context.Context, *SetDoctorAvailabilityRequest) (*SetDoctorAvailabilityResponse, error)
 	mustEmbedUnimplementedAdminServer()
 }
 
@@ -165,6 +177,9 @@ func (UnimplementedAdminServer) GetPaidPatients(context.Context, *GetPaidPatient
 }
 func (UnimplementedAdminServer) CreatePrescription(context.Context, *CreatePrescriptionRequest) (*CreatePrescriptionResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreatePrescription not implemented")
+}
+func (UnimplementedAdminServer) SetDoctorAvailability(context.Context, *SetDoctorAvailabilityRequest) (*SetDoctorAvailabilityResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SetDoctorAvailability not implemented")
 }
 func (UnimplementedAdminServer) mustEmbedUnimplementedAdminServer() {}
 
@@ -323,6 +338,24 @@ func _Admin_CreatePrescription_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Admin_SetDoctorAvailability_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SetDoctorAvailabilityRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AdminServer).SetDoctorAvailability(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Admin_SetDoctorAvailability_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AdminServer).SetDoctorAvailability(ctx, req.(*SetDoctorAvailabilityRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Admin_ServiceDesc is the grpc.ServiceDesc for Admin service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -361,6 +394,10 @@ var Admin_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreatePrescription",
 			Handler:    _Admin_CreatePrescription_Handler,
+		},
+		{
+			MethodName: "SetDoctorAvailability",
+			Handler:    _Admin_SetDoctorAvailability_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

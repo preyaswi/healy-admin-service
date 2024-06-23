@@ -6,6 +6,7 @@ import (
 	"healy-admin/pkg/domain"
 	interfaces "healy-admin/pkg/repository/interface"
 	"healy-admin/pkg/utils/models"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -104,37 +105,55 @@ func (ad *adminRepository) GetPaidBookingsByDoctorID(doctorId int) ([]domain.Boo
 	return bookings, nil
 }
 func (ad *adminRepository) CheckPatientPayment(doctorID int, patientID string) (bool, error) {
-    var booking domain.Booking
-    err := ad.DB.Where("doctor_id = ? AND patient_id = ? AND payment_status = ?", doctorID, patientID, "paid").First(&booking).Error
-    if err != nil {
-        if err == gorm.ErrRecordNotFound {
-            return false, nil
-        }
-        return false, fmt.Errorf("error checking payment status")
-    }
+	var booking domain.Booking
+	err := ad.DB.Where("doctor_id = ? AND patient_id = ? AND payment_status = ?", doctorID, patientID, "paid").First(&booking).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return false, nil
+		}
+		return false, fmt.Errorf("error checking payment status")
+	}
 
-    return true, nil
+	return true, nil
 }
 
 func (ad *adminRepository) CreatePrescription(prescription models.PrescriptionRequest) (domain.Prescription, error) {
-    prescriptionModel :=domain.Prescription{
-        BookingID: uint(prescription.BookingID),
-        DoctorID:  uint(prescription.DoctorID),
-        PatientID:prescription.PatientID,
-        Medicine:  prescription.Medicine,
-        Dosage:    prescription.Dosage,
-        Notes:     prescription.Notes,
-    }
+	prescriptionModel := domain.Prescription{
+		BookingID: uint(prescription.BookingID),
+		DoctorID:  uint(prescription.DoctorID),
+		PatientID: prescription.PatientID,
+		Medicine:  prescription.Medicine,
+		Dosage:    prescription.Dosage,
+		Notes:     prescription.Notes,
+	}
 
-    if err := ad.DB.Create(&prescriptionModel).Error; err != nil {
-        return domain.Prescription{}, fmt.Errorf("error saving prescription")
-    }
+	if err := ad.DB.Create(&prescriptionModel).Error; err != nil {
+		return domain.Prescription{}, fmt.Errorf("error saving prescription")
+	}
 
-    // Retrieve the created prescription with all fields populated
-    var createdPrescription domain.Prescription
-    if err := ad.DB.First(&createdPrescription, prescriptionModel.ID).Error; err != nil {
-        return domain.Prescription{}, fmt.Errorf("error retrieving created prescription")
-    }
+	// Retrieve the created prescription with all fields populated
+	var createdPrescription domain.Prescription
+	if err := ad.DB.First(&createdPrescription, prescriptionModel.ID).Error; err != nil {
+		return domain.Prescription{}, fmt.Errorf("error retrieving created prescription")
+	}
 
-    return createdPrescription, nil
+	return createdPrescription, nil
+}
+func (ad *adminRepository) SetDoctorAvailability(availabiity models.SetAvailability) (string, error) {
+	var slots []domain.Availability
+	currentTime := availabiity.StartTime
+	for currentTime.Before(availabiity.EndTime) {
+		slots = append(slots, domain.Availability{
+			DoctorID:  uint(availabiity.DoctorId),
+			Date:      availabiity.Date,
+			StartTime: currentTime,
+			EndTime:   currentTime.Add(30 * time.Minute),
+			IsBooked:  false,
+		})
+		currentTime = currentTime.Add(30 * time.Minute)
+	}
+	if err := ad.DB.Create(&slots).Error; err != nil {
+		return "", err
+	}
+	return "success", nil
 }

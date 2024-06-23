@@ -1,5 +1,7 @@
 package models
 
+import "time"
+
 type AdminLogin struct {
 	Email    string `json:"email" binding:"required" validate:"required"`
 	Password string `json:"password" binding:"required" validate:"required"`
@@ -34,3 +36,9 @@ type PaymentDetails struct{
 	PaymentStatus string
 }
 
+type SetAvailability struct{
+	DoctorId int
+    Date time.Time 
+	StartTime  time.Time 
+	EndTime time.Time 
+}

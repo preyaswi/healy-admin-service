@@ -5,6 +5,7 @@ import (
 	pb "healy-admin/pkg/pb/admin"
 	interfaces "healy-admin/pkg/usecase/interface"
 	"healy-admin/pkg/utils/models"
+	"time"
 )
 
 type AdminServer struct {
@@ -65,96 +66,114 @@ func (ad *AdminServer) AdminLogin(ctx context.Context, Req *pb.AdminLoginInReque
 		Token:        admin.Token,
 	}, nil
 }
-func (ad *AdminServer)AddTobookings(ctx context.Context,req *pb.Bookingreq) (*pb.Bookingres, error)  {
-	err:=ad.adminUseCase.AddToBooking(req.PatientId,int(req.DoctorId))
-	if err!=nil{
-		return &pb.Bookingres{},err
+func (ad *AdminServer) AddTobookings(ctx context.Context, req *pb.Bookingreq) (*pb.Bookingres, error) {
+	err := ad.adminUseCase.AddToBooking(req.PatientId, int(req.DoctorId))
+	if err != nil {
+		return &pb.Bookingres{}, err
 	}
-	return &pb.Bookingres{},nil
+	return &pb.Bookingres{}, nil
 }
-func (ad *AdminServer)CancelBookings(ctx context.Context,req  *pb.Canbookingreq) (*pb.Bookingres, error)  {
-	err:=ad.adminUseCase.CancelBooking(req.PatientId,int(req.BookingId))
-	if err!=nil{
-		return &pb.Bookingres{},err
+func (ad *AdminServer) CancelBookings(ctx context.Context, req *pb.Canbookingreq) (*pb.Bookingres, error) {
+	err := ad.adminUseCase.CancelBooking(req.PatientId, int(req.BookingId))
+	if err != nil {
+		return &pb.Bookingres{}, err
 	}
-	return &pb.Bookingres{},nil
+	return &pb.Bookingres{}, nil
 }
-func (ad *AdminServer)MakePaymentRazorpay(ctx context.Context,req *pb.PaymentReq)(*pb.PaymentRes,error)  {
-	bookingid:=models.Paymentreq{
+func (ad *AdminServer) MakePaymentRazorpay(ctx context.Context, req *pb.PaymentReq) (*pb.PaymentRes, error) {
+	bookingid := models.Paymentreq{
 		Bookingid: uint(req.BookingId),
 	}
-	paymentDetails,razorId,err:=ad.adminUseCase.MakePaymentRazorpay(int(bookingid.Bookingid))
-	if err!=nil{
-		return &pb.PaymentRes{},err
+	paymentDetails, razorId, err := ad.adminUseCase.MakePaymentRazorpay(int(bookingid.Bookingid))
+	if err != nil {
+		return &pb.PaymentRes{}, err
 	}
-	paymentDetail:=&pb.PaymentDetails{
-		BookingId: uint32(paymentDetails.BookingId),
-		PatientId: paymentDetails.PatientId,
-		DoctorId: uint32(paymentDetails.DoctorId),
-		DoctorName: paymentDetails.DoctorName,
-		DoctorEmail: paymentDetails.DoctorEmail,
-		Fees: paymentDetails.Fees,
+	paymentDetail := &pb.PaymentDetails{
+		BookingId:     uint32(paymentDetails.BookingId),
+		PatientId:     paymentDetails.PatientId,
+		DoctorId:      uint32(paymentDetails.DoctorId),
+		DoctorName:    paymentDetails.DoctorName,
+		DoctorEmail:   paymentDetails.DoctorEmail,
+		Fees:          paymentDetails.Fees,
 		PaymentStatus: paymentDetails.PaymentStatus,
-
 	}
 	return &pb.PaymentRes{
 		PaymentDetails: paymentDetail,
-		Razorid: razorId,
-	},nil
-	
-	
+		Razorid:        razorId,
+	}, nil
+
 }
-func (ad *AdminServer)VerifyPayment(ctx context.Context,req *pb.PaymentReq) (*pb.Verifyres, error) {
-	err:=ad.adminUseCase.VerifyPayment(int(req.BookingId))
-	if err!=nil{
-		return &pb.Verifyres{},err
+func (ad *AdminServer) VerifyPayment(ctx context.Context, req *pb.PaymentReq) (*pb.Verifyres, error) {
+	err := ad.adminUseCase.VerifyPayment(int(req.BookingId))
+	if err != nil {
+		return &pb.Verifyres{}, err
 	}
-	return &pb.Verifyres{},nil
+	return &pb.Verifyres{}, nil
 }
-func (ad *AdminServer)GetPaidPatients(ctx context.Context,req *pb.GetPaidPatientsRequest) (*pb.GetPaidPatientsResponse, error) {
-    bookedPatients, err := ad.adminUseCase.GetPaidPatients(int(req.DoctorId))
-    if err != nil {
-        return &pb.GetPaidPatientsResponse{}, err
-    }
-    pbBookedPatients := make([]*pb.BookedPatient, len(bookedPatients))
-    for i, bp := range bookedPatients {
-        pbBookedPatients[i] = &pb.BookedPatient{
-            BookingId: uint32(bp.BookingId),
+func (ad *AdminServer) GetPaidPatients(ctx context.Context, req *pb.GetPaidPatientsRequest) (*pb.GetPaidPatientsResponse, error) {
+	bookedPatients, err := ad.adminUseCase.GetPaidPatients(int(req.DoctorId))
+	if err != nil {
+		return &pb.GetPaidPatientsResponse{}, err
+	}
+	pbBookedPatients := make([]*pb.BookedPatient, len(bookedPatients))
+	for i, bp := range bookedPatients {
+		pbBookedPatients[i] = &pb.BookedPatient{
+			BookingId:     uint32(bp.BookingId),
 			PaymentStatus: bp.PaymentStatus,
-            PatientDetail: &pb.Patient{
-                Id:            uint32(bp.Patientdetail.Id),
-                Fullname:     bp.Patientdetail.Fullname,
-                Email:        bp.Patientdetail.Email,
-                Gender:       bp.Patientdetail.Gender,
-                Contactnumber: bp.Patientdetail.Contactnumber,
-            },
-        }
-    }
-	
-    return &pb.GetPaidPatientsResponse{
-        BookedPatients: pbBookedPatients,
-    }, nil
-}
-func (ad *AdminServer)CreatePrescription(ctx context.Context,req *pb.CreatePrescriptionRequest) (*pb.CreatePrescriptionResponse, error)  {
-	prescriptionreq:=models.PrescriptionRequest{
-		DoctorID: int(req.DoctorId),
-		PatientID:req.PatientId,
-		BookingID: int(req.BookingId),
-		Medicine: req.Medicine,
-		Dosage: req.Dosage,
-		Notes: req.Notes,
+			PatientDetail: &pb.Patient{
+				Id:            uint32(bp.Patientdetail.Id),
+				Fullname:      bp.Patientdetail.Fullname,
+				Email:         bp.Patientdetail.Email,
+				Gender:        bp.Patientdetail.Gender,
+				Contactnumber: bp.Patientdetail.Contactnumber,
+			},
+		}
 	}
-	prescription,err:=ad.adminUseCase.CreatePrescription(prescriptionreq)
-	if err!=nil{
-		return &pb.CreatePrescriptionResponse{},err
+
+	return &pb.GetPaidPatientsResponse{
+		BookedPatients: pbBookedPatients,
+	}, nil
+}
+func (ad *AdminServer) CreatePrescription(ctx context.Context, req *pb.CreatePrescriptionRequest) (*pb.CreatePrescriptionResponse, error) {
+	prescriptionreq := models.PrescriptionRequest{
+		DoctorID:  int(req.DoctorId),
+		PatientID: req.PatientId,
+		BookingID: int(req.BookingId),
+		Medicine:  req.Medicine,
+		Dosage:    req.Dosage,
+		Notes:     req.Notes,
+	}
+	prescription, err := ad.adminUseCase.CreatePrescription(prescriptionreq)
+	if err != nil {
+		return &pb.CreatePrescriptionResponse{}, err
 	}
 	return &pb.CreatePrescriptionResponse{
-		Id: uint32(prescription.ID),
+		Id:        uint32(prescription.ID),
 		BookingId: uint32(prescription.BookingID),
-		DoctorId: uint32(prescription.DoctorID),
+		DoctorId:  uint32(prescription.DoctorID),
 		PatientId: prescription.PatientID,
-		Medicine: prescription.Medicine,
-		Dosage: prescription.Dosage,
-		Notes: prescription.Notes,
-	},nil
+		Medicine:  prescription.Medicine,
+		Dosage:    prescription.Dosage,
+		Notes:     prescription.Notes,
+	}, nil
+}
+func (ad *AdminServer) SetDoctorAvailability(ctx context.Context, req *pb.SetDoctorAvailabilityRequest) (*pb.SetDoctorAvailabilityResponse, error) {
+	doctorId := req.DoctorId
+	Date, _ := time.Parse("2006-01-02", req.Date)
+	startTime, _ := time.Parse("15:04", req.StartTime)
+	endtime, _ := time.Parse("15:04", req.EndTime)
+
+	status, err := ad.adminUseCase.SetDoctorAvailability(models.SetAvailability{
+		DoctorId:  int(doctorId),
+		Date:      Date,
+		StartTime: startTime,
+		EndTime:   endtime,
+	})
+	if err != nil {
+		return &pb.SetDoctorAvailabilityResponse{}, err
+	}
+	return &pb.SetDoctorAvailabilityResponse{
+		Status: status,
+	}, nil
+
 }

@@ -223,3 +223,10 @@ func (ad *adminUseCase) CreatePrescription(prescription models.PrescriptionReque
 
     return createdPrescription, nil
 }
+func (ad *adminUseCase)SetDoctorAvailability(availabiity models.SetAvailability)(string,error){
+	status,err:=ad.adminRepository.SetDoctorAvailability(availabiity)
+	if err!=nil{
+		return "",err
+	}
+	return status,nil
+}
