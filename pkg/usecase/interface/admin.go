@@ -20,4 +20,6 @@ type AdminUseCase interface {
 	GetDoctorAvailability(dotctorid int,date time.Time)([]models.AvailableSlots,error)
 
 	BookSlot(patientid string ,bookingid,slotid int)error
+	BookDoctor(patientid string,slotid int)(domain.Booking, string, error)
+	VerifyandCalenderCreation(bookingid int,paymentid,razorid string)error
 }

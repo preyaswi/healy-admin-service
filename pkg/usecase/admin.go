@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	clientinterface "healy-admin/pkg/client/interface"
@@ -17,6 +18,9 @@ import (
 	"github.com/jinzhu/copier"
 	"github.com/razorpay/razorpay-go"
 	"golang.org/x/crypto/bcrypt"
+	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/google"
+	"google.golang.org/api/calendar/v3"
 )
 
 type adminUseCase struct {
@@ -208,7 +212,7 @@ func (ad *adminUseCase) GetPaidPatients(doctor_id int) ([]models.BookedPatient, 
 	return bookedPatients, nil
 }
 func (ad *adminUseCase) CreatePrescription(prescription models.PrescriptionRequest) (domain.Prescription, error) {
-	paid, err := ad.adminRepository.CheckPatientPayment(prescription.PatientID,prescription.BookingID)
+	paid, err := ad.adminRepository.CheckPatientPayment(prescription.PatientID, prescription.BookingID)
 	if err != nil {
 		return domain.Prescription{}, fmt.Errorf("error checking payment status")
 	}
@@ -238,34 +242,218 @@ func (ad *adminUseCase) GetDoctorAvailability(dotctorid int, date time.Time) ([]
 	}
 	return availableSlots, nil
 }
-func (ad *adminUseCase) BookSlot(patientid string ,bookingid,slotid int)error {
-	paid, err := ad.adminRepository.CheckPatientPayment(patientid,bookingid)
+func (ad *adminUseCase) BookSlot(patientid string, bookingid, slotid int) error {
+	paid, err := ad.adminRepository.CheckPatientPayment(patientid, bookingid)
 	if err != nil {
-		return  errors.New("error checking payment status")
+		return errors.New("error checking payment status")
 	}
 
 	if !paid {
-		return  errors.New("patient has not paid the booking fee")
+		return errors.New("patient has not paid the booking fee")
 	}
 	slotAvailable, err := ad.adminRepository.CheckSlotAvailability(slotid)
-    if err != nil {
-        return err
-    }
-    if !slotAvailable {
-        return errors.New("slot is already booked")
-    }
-    // Book the slot
-    err = ad.adminRepository.BookSlot(bookingid, slotid)
-    if err != nil {
-        return err
-    }
+	if err != nil {
+		return err
+	}
+	if !slotAvailable {
+		return errors.New("slot is already booked")
+	}
+	// Book the slot
+	err = ad.adminRepository.BookSlot(bookingid, slotid)
+	if err != nil {
+		return err
+	}
 
-    // Mark slot as booked
-    err = ad.adminRepository.MarkSlotAsBooked(slotid)
-    if err != nil {
-        return err
-    }
+	// Mark slot as booked
+	err = ad.adminRepository.MarkSlotAsBooked(slotid)
+	if err != nil {
+		return err
+	}
 
-    return nil
+	return nil
+
+}
+func (ad *adminUseCase) BookDoctor(patientid string, slotid int) (domain.Booking, string, error) {
+	cfg, err := config.LoadConfig()
+	if err != nil {
+		return domain.Booking{}, "", errors.New("couldn't load razorpay credentials")
+	}
+	slotAvailable, err := ad.adminRepository.CheckSlotAvailability(slotid)
+	if err != nil {
+		return domain.Booking{}, "", err
+	}
+	if !slotAvailable {
+		return domain.Booking{}, "", errors.New("slot is already booked")
+	}
+	doctorid, err := ad.adminRepository.GetDoctorIdFromSlotId(slotid)
+	if err != nil {
+		return domain.Booking{}, "", err
+	}
+	doctordetail, err := ad.doctorRepository.DoctorDetailforBooking(doctorid)
+	fmt.Println(doctordetail, "this is the doctor details")
+	if err != nil {
+		return domain.Booking{}, "", err
+	}
+	bookingid, err := ad.adminRepository.AddDetailsToBooking(patientid, doctordetail, slotid)
+	if err != nil {
+		return domain.Booking{}, "", err
+	}
+	client := razorpay.NewClient(cfg.KEY_ID_fOR_PAY, cfg.SECRET_KEY_FOR_PAY)
+	data := map[string]interface{}{
+		"amount":   int(doctordetail.Fees) * 100,
+		"currency": "INR",
+		"receipt":  "some_receipt_id",
+	}
+	body, err := client.Order.Create(data, nil)
+	if err != nil {
+
+		return domain.Booking{}, "", err
+	}
+	RazorpayorderId := body["id"].(string)
+
+	err = ad.adminRepository.AddRazorPayDetails(uint(bookingid), RazorpayorderId)
+	if err != nil {
+		return domain.Booking{}, "", err
+	}
+	paymentdetail, err := ad.adminRepository.GetBookingByID(bookingid)
+	if err != nil {
+		return domain.Booking{}, "", err
+	}
+	return paymentdetail, RazorpayorderId, nil
+}
+func (ad *adminUseCase) VerifyandCalenderCreation(bookingid int, paymentid, razorid string) error {
+	status, err := ad.adminRepository.CheckPaymentStatus(bookingid)
+	if err != nil {
+		return err
+	}
+	if status == "paid" {
+		return errors.New("already paid")
+	}
+	if status == "initialized" {
+
+		err = ad.adminRepository.UpdatePaymentDetails(bookingid, paymentid)
+		if err != nil {
+			return err
+		}
+		err = ad.adminRepository.UpdatePaymentStatus(bookingid, "paid")
+		if err != nil {
+			return err
+		}
+	}
+	bookingdetails, err := ad.adminRepository.GetBookingByID(bookingid)
+	if err != nil {
+		return err
+	}
+	err = ad.adminRepository.UpdateSlotAvailability(int(bookingdetails.Slot_id))
+	if err != nil {
+		return err
+	}
+	availability, err := ad.adminRepository.GetAvailabilityByID(int(bookingdetails.Slot_id))
+	if err != nil {
+		return err
+	}
+	patientGoogleDetails, err := ad.patientRepository.GetPatientGoogleDetailsByID(bookingdetails.PatientId)
+	if err != nil {
+		return err
+	}
+	doctordetail, err := ad.doctorRepository.DoctorDetailforBooking(int(bookingdetails.DoctorId))
+	if err != nil {
+		return err
+	}
+	eventID, err := ad.createGoogleCalendarEvent(patientGoogleDetails, availability, doctordetail.DoctorEmail)
+	if err != nil {
+		return err
+	}
+	err = ad.adminRepository.StoreEventDetails(domain.Event{
+		BookingID:   uint(bookingid),
+		PatientID:   bookingdetails.PatientId,
+		EventID:     eventID,
+		Summary:     "Doctor Appointment",
+		Description: "Your scheduled appointment with the doctor",
+		Start:       availability.StartTime,
+		End:         availability.EndTime,
+		GuestEmail:  bookingdetails.DoctorEmail,
+	})
+	if err != nil {
+		return err
+	}
+
+	return nil
+
+}
+func (ad *adminUseCase) createGoogleCalendarEvent(patientDetails models.GooglePatientDetails, availability domain.Availability, doctoremail string) (string, error) {
+	ctx := context.Background()
+	cfg, err := config.LoadConfig()
+	if err != nil {
+		return "", errors.New("couldn't load config for calender creation")
+	}
+	config := &oauth2.Config{
+		ClientID:     cfg.GoogleClientId,
+		ClientSecret: cfg.GoogleSecretId,
+		Endpoint:     google.Endpoint,
+		Scopes:       []string{calendar.CalendarScope},
+	}
+
+	  // Parse token expiry
+	  tokenExpiry, err := time.Parse(time.RFC3339, patientDetails.TokenExpiry)
+	  if err != nil {
+		  // If parsing fails, try an alternative approach
+		  tokenExpiry, err = time.Parse("2006-01-02 15:04:05.999999999 -0700 MST", patientDetails.TokenExpiry)
+		  if err != nil {
+			  // If it still fails, use the current time as a fallback
+			  tokenExpiry = time.Now()
+		  }
+	  }
+  
+	token := &oauth2.Token{
+		AccessToken:  patientDetails.AccessToken,
+		RefreshToken: patientDetails.RefreshToken,
+		TokenType:    "Bearer",
+		Expiry:       tokenExpiry,
+	}
+	// Create a new token source with automatic token refresh
+	tokenSource := config.TokenSource(ctx, token)
+
+	// Create a client with the refreshing token source
+	client := oauth2.NewClient(ctx, tokenSource)
+
+	srv, err := calendar.New(client)
+	if err != nil {
+		return "", err
+	}
+	event := &calendar.Event{
+		Summary:     "Doctor Appointment",
+		Description: "Your scheduled appointment with the doctor",
+		Start: &calendar.EventDateTime{
+			DateTime: availability.StartTime.Format(time.RFC3339),
+			TimeZone: "UTC", // e.g., "America/New_York"
+		},
+		End: &calendar.EventDateTime{
+			DateTime: availability.EndTime.Format(time.RFC3339),
+			TimeZone: "UTC", // e.g., "America/New_York"
+		},
+		Attendees: []*calendar.EventAttendee{
+			{Email: doctoremail},
+		},
+	}
+
+	createdEvent, err := srv.Events.Insert("primary", event).Do()
+	if err != nil {
+		return "", err
+	}
+
+	// If the token was refreshed, update it in the database
+	newToken, err := tokenSource.Token()
+	if err != nil {
+		return "", err
+	}
+	if newToken.AccessToken != token.AccessToken {
+		err = ad.patientRepository.UpdatePatientGoogleToken(patientDetails.GoogleID, newToken.AccessToken, newToken.RefreshToken, newToken.Expiry.Format(time.RFC3339))
+		if err != nil {
+			return "", err
+		}
+	}
+
+	return createdEvent.Id, nil
 
 }

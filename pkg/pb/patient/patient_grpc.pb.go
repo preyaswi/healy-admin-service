@@ -19,7 +19,9 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	Patient_IndPatientDetails_FullMethodName = "/patient.Patient/IndPatientDetails"
+	Patient_IndPatientDetails_FullMethodName           = "/patient.Patient/IndPatientDetails"
+	Patient_GetPatientGoogleDetailsByID_FullMethodName = "/patient.Patient/GetPatientGoogleDetailsByID"
+	Patient_UpdatePatientGoogleToken_FullMethodName    = "/patient.Patient/UpdatePatientGoogleToken"
 )
 
 // PatientClient is the client API for Patient service.
@@ -27,6 +29,8 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type PatientClient interface {
 	IndPatientDetails(ctx context.Context, in *Idreq, opts ...grpc.CallOption) (*PatientDetails, error)
+	GetPatientGoogleDetailsByID(ctx context.Context, in *Idreq, opts ...grpc.CallOption) (*GooglePatientDetails, error)
+	UpdatePatientGoogleToken(ctx context.Context, in *UpdateGoogleTokenReq, opts ...grpc.CallOption) (*UpdateGoogleTokenRes, error)
 }
 
 type patientClient struct {
@@ -46,11 +50,31 @@ func (c *patientClient) IndPatientDetails(ctx context.Context, in *Idreq, opts .
 	return out, nil
 }
 
+func (c *patientClient) GetPatientGoogleDetailsByID(ctx context.Context, in *Idreq, opts ...grpc.CallOption) (*GooglePatientDetails, error) {
+	out := new(GooglePatientDetails)
+	err := c.cc.Invoke(ctx, Patient_GetPatientGoogleDetailsByID_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *patientClient) UpdatePatientGoogleToken(ctx context.Context, in *UpdateGoogleTokenReq, opts ...grpc.CallOption) (*UpdateGoogleTokenRes, error) {
+	out := new(UpdateGoogleTokenRes)
+	err := c.cc.Invoke(ctx, Patient_UpdatePatientGoogleToken_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // PatientServer is the server API for Patient service.
 // All implementations must embed UnimplementedPatientServer
 // for forward compatibility
 type PatientServer interface {
 	IndPatientDetails(context.Context, *Idreq) (*PatientDetails, error)
+	GetPatientGoogleDetailsByID(context.Context, *Idreq) (*GooglePatientDetails, error)
+	UpdatePatientGoogleToken(context.Context, *UpdateGoogleTokenReq) (*UpdateGoogleTokenRes, error)
 	mustEmbedUnimplementedPatientServer()
 }
 
@@ -60,6 +84,12 @@ type UnimplementedPatientServer struct {
 
 func (UnimplementedPatientServer) IndPatientDetails(context.Context, *Idreq) (*PatientDetails, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method IndPatientDetails not implemented")
+}
+func (UnimplementedPatientServer) GetPatientGoogleDetailsByID(context.Context, *Idreq) (*GooglePatientDetails, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetPatientGoogleDetailsByID not implemented")
+}
+func (UnimplementedPatientServer) UpdatePatientGoogleToken(context.Context, *UpdateGoogleTokenReq) (*UpdateGoogleTokenRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdatePatientGoogleToken not implemented")
 }
 func (UnimplementedPatientServer) mustEmbedUnimplementedPatientServer() {}
 
@@ -92,6 +122,42 @@ func _Patient_IndPatientDetails_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Patient_GetPatientGoogleDetailsByID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Idreq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PatientServer).GetPatientGoogleDetailsByID(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Patient_GetPatientGoogleDetailsByID_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PatientServer).GetPatientGoogleDetailsByID(ctx, req.(*Idreq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Patient_UpdatePatientGoogleToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateGoogleTokenReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PatientServer).UpdatePatientGoogleToken(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Patient_UpdatePatientGoogleToken_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PatientServer).UpdatePatientGoogleToken(ctx, req.(*UpdateGoogleTokenReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Patient_ServiceDesc is the grpc.ServiceDesc for Patient service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -102,6 +168,14 @@ var Patient_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "IndPatientDetails",
 			Handler:    _Patient_IndPatientDetails_Handler,
+		},
+		{
+			MethodName: "GetPatientGoogleDetailsByID",
+			Handler:    _Patient_GetPatientGoogleDetailsByID_Handler,
+		},
+		{
+			MethodName: "UpdatePatientGoogleToken",
+			Handler:    _Patient_UpdatePatientGoogleToken_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

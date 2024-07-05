@@ -12,7 +12,11 @@ type AdminRepository interface {
 	CheckAdminExistsByEmail(email string) (*domain.Admin, error)
 
 	AddToBooking(patientid string,doctordetail models.BookingDoctorDetails)error
+	AddDetailsToBooking(patientid string,doctordetail models.BookingDoctorDetails,slotid int)(int,error)
 	GetBookingByID(bookingid int)(domain.Booking,error)
+	UpdateSlotAvailability(slotid int)error
+	GetAvailabilityByID(slotID int) (domain.Availability, error)
+	StoreEventDetails(event domain.Event) error 
 	RemoveBooking(bookingID int) error
 
 	AddRazorPayDetails(bookingid uint,razorPaypaymentID string) error
@@ -27,4 +31,7 @@ type AdminRepository interface {
 	CheckSlotAvailability(slotid int)(bool,error)
 	BookSlot(bookingid, slotid int) error
 	MarkSlotAsBooked(slotid int) error
+
+	GetDoctorIdFromSlotId(slotid int)(int,error)
+	UpdatePaymentDetails(bookingid int,paymentid string)error
 }

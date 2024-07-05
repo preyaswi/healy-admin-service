@@ -19,17 +19,19 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	Admin_AdminSignup_FullMethodName           = "/admin.Admin/AdminSignup"
-	Admin_AdminLogin_FullMethodName            = "/admin.Admin/AdminLogin"
-	Admin_AddTobookings_FullMethodName         = "/admin.Admin/AddTobookings"
-	Admin_CancelBookings_FullMethodName        = "/admin.Admin/CancelBookings"
-	Admin_MakePaymentRazorpay_FullMethodName   = "/admin.Admin/MakePaymentRazorpay"
-	Admin_VerifyPayment_FullMethodName         = "/admin.Admin/VerifyPayment"
-	Admin_GetPaidPatients_FullMethodName       = "/admin.Admin/GetPaidPatients"
-	Admin_CreatePrescription_FullMethodName    = "/admin.Admin/CreatePrescription"
-	Admin_SetDoctorAvailability_FullMethodName = "/admin.Admin/SetDoctorAvailability"
-	Admin_GetDoctorAvailability_FullMethodName = "/admin.Admin/GetDoctorAvailability"
-	Admin_BookSlot_FullMethodName              = "/admin.Admin/BookSlot"
+	Admin_AdminSignup_FullMethodName               = "/admin.Admin/AdminSignup"
+	Admin_AdminLogin_FullMethodName                = "/admin.Admin/AdminLogin"
+	Admin_AddTobookings_FullMethodName             = "/admin.Admin/AddTobookings"
+	Admin_CancelBookings_FullMethodName            = "/admin.Admin/CancelBookings"
+	Admin_MakePaymentRazorpay_FullMethodName       = "/admin.Admin/MakePaymentRazorpay"
+	Admin_VerifyPayment_FullMethodName             = "/admin.Admin/VerifyPayment"
+	Admin_GetPaidPatients_FullMethodName           = "/admin.Admin/GetPaidPatients"
+	Admin_CreatePrescription_FullMethodName        = "/admin.Admin/CreatePrescription"
+	Admin_SetDoctorAvailability_FullMethodName     = "/admin.Admin/SetDoctorAvailability"
+	Admin_GetDoctorAvailability_FullMethodName     = "/admin.Admin/GetDoctorAvailability"
+	Admin_BookSlot_FullMethodName                  = "/admin.Admin/BookSlot"
+	Admin_BookDoctor_FullMethodName                = "/admin.Admin/BookDoctor"
+	Admin_VerifyandCalenderCreation_FullMethodName = "/admin.Admin/VerifyandCalenderCreation"
 )
 
 // AdminClient is the client API for Admin service.
@@ -47,6 +49,8 @@ type AdminClient interface {
 	SetDoctorAvailability(ctx context.Context, in *SetDoctorAvailabilityRequest, opts ...grpc.CallOption) (*SetDoctorAvailabilityResponse, error)
 	GetDoctorAvailability(ctx context.Context, in *GetDoctorAvailabilityRequest, opts ...grpc.CallOption) (*GetDoctorAvailabilityResponse, error)
 	BookSlot(ctx context.Context, in *BookSlotreq, opts ...grpc.CallOption) (*BookSlotres, error)
+	BookDoctor(ctx context.Context, in *BookDoctorreq, opts ...grpc.CallOption) (*PaymentRes, error)
+	VerifyandCalenderCreation(ctx context.Context, in *VerifyPaymentandcalenderreq, opts ...grpc.CallOption) (*VerifyPaymentandcalenderres, error)
 }
 
 type adminClient struct {
@@ -156,6 +160,24 @@ func (c *adminClient) BookSlot(ctx context.Context, in *BookSlotreq, opts ...grp
 	return out, nil
 }
 
+func (c *adminClient) BookDoctor(ctx context.Context, in *BookDoctorreq, opts ...grpc.CallOption) (*PaymentRes, error) {
+	out := new(PaymentRes)
+	err := c.cc.Invoke(ctx, Admin_BookDoctor_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *adminClient) VerifyandCalenderCreation(ctx context.Context, in *VerifyPaymentandcalenderreq, opts ...grpc.CallOption) (*VerifyPaymentandcalenderres, error) {
+	out := new(VerifyPaymentandcalenderres)
+	err := c.cc.Invoke(ctx, Admin_VerifyandCalenderCreation_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AdminServer is the server API for Admin service.
 // All implementations must embed UnimplementedAdminServer
 // for forward compatibility
@@ -171,6 +193,8 @@ type AdminServer interface {
 	SetDoctorAvailability(context.Context, *SetDoctorAvailabilityRequest) (*SetDoctorAvailabilityResponse, error)
 	GetDoctorAvailability(context.Context, *GetDoctorAvailabilityRequest) (*GetDoctorAvailabilityResponse, error)
 	BookSlot(context.Context, *BookSlotreq) (*BookSlotres, error)
+	BookDoctor(context.Context, *BookDoctorreq) (*PaymentRes, error)
+	VerifyandCalenderCreation(context.Context, *VerifyPaymentandcalenderreq) (*VerifyPaymentandcalenderres, error)
 	mustEmbedUnimplementedAdminServer()
 }
 
@@ -210,6 +234,12 @@ func (UnimplementedAdminServer) GetDoctorAvailability(context.Context, *GetDocto
 }
 func (UnimplementedAdminServer) BookSlot(context.Context, *BookSlotreq) (*BookSlotres, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method BookSlot not implemented")
+}
+func (UnimplementedAdminServer) BookDoctor(context.Context, *BookDoctorreq) (*PaymentRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method BookDoctor not implemented")
+}
+func (UnimplementedAdminServer) VerifyandCalenderCreation(context.Context, *VerifyPaymentandcalenderreq) (*VerifyPaymentandcalenderres, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method VerifyandCalenderCreation not implemented")
 }
 func (UnimplementedAdminServer) mustEmbedUnimplementedAdminServer() {}
 
@@ -422,6 +452,42 @@ func _Admin_BookSlot_Handler(srv interface{}, ctx context.Context, dec func(inte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Admin_BookDoctor_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BookDoctorreq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AdminServer).BookDoctor(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Admin_BookDoctor_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AdminServer).BookDoctor(ctx, req.(*BookDoctorreq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Admin_VerifyandCalenderCreation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(VerifyPaymentandcalenderreq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AdminServer).VerifyandCalenderCreation(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Admin_VerifyandCalenderCreation_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AdminServer).VerifyandCalenderCreation(ctx, req.(*VerifyPaymentandcalenderreq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Admin_ServiceDesc is the grpc.ServiceDesc for Admin service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -472,6 +538,14 @@ var Admin_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "BookSlot",
 			Handler:    _Admin_BookSlot_Handler,
+		},
+		{
+			MethodName: "BookDoctor",
+			Handler:    _Admin_BookDoctor_Handler,
+		},
+		{
+			MethodName: "VerifyandCalenderCreation",
+			Handler:    _Admin_VerifyandCalenderCreation_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

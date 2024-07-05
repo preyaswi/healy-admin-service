@@ -21,6 +21,9 @@ service Admin{
     rpc GetDoctorAvailability(GetDoctorAvailabilityRequest)returns (GetDoctorAvailabilityResponse);
 
     rpc BookSlot(BookSlotreq)returns(BookSlotres);
+    rpc BookDoctor(BookDoctorreq)returns(paymentRes);
+    rpc VerifyandCalenderCreation(VerifyPaymentandcalenderreq)returns(VerifyPaymentandcalenderres){};
+
     
     
 }
@@ -146,3 +149,13 @@ message BookSlotreq{
  uint32 slot_id=3;
 }
 message BookSlotres{}
+message BookDoctorreq{
+    string patient_id=1;
+    uint32 slot_id=2;
+}
+message VerifyPaymentandcalenderreq{
+    uint32 booking_id=1;
+    string payment_id=2;
+    string razor_id=3;
+}
+message VerifyPaymentandcalenderres{}

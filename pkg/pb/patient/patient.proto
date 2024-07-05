@@ -6,6 +6,8 @@ option go_package = "./pkg/pb/patient";
 
 service Patient{
     rpc IndPatientDetails(idreq)returns(PatientDetails){};
+    rpc GetPatientGoogleDetailsByID(idreq)returns(GooglePatientDetails){};
+    rpc UpdatePatientGoogleToken(UpdateGoogleTokenReq)returns(UpdateGoogleTokenRes){};
 }
 message idreq{
    string user_id=1;
@@ -17,3 +19,17 @@ message PatientDetails{
   string  Gender        =4;
    string Contactnumber =5;
 }
+message GooglePatientDetails{
+   string googleid=1;
+   string email=2;
+   string accesstoken=3;
+   string refreshtoken=4;
+   string tokenexpiry=5;
+}
+message UpdateGoogleTokenReq{
+string googleID=1;
+string accessToken=2;
+string refreshToken=3;
+string tokenExpiry=4;
+}
+message UpdateGoogleTokenRes{}

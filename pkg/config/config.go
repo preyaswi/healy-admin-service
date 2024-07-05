@@ -14,10 +14,14 @@ type Config struct {
 	PATIENT_SVC string `mapstructure:"PATIENT_SVC"`
 	KEY_ID_fOR_PAY     string `mapstructure:"KEY_ID_fOR_PAY"`
 	SECRET_KEY_FOR_PAY string `mapstructure:"SECRET_KEY_FOR_PAY"`
+
+	GoogleClientId string `mapstructure:"YOUR_CLIENT_ID"`
+	GoogleSecretId string `mapstructure:"YOUR_CLIENT_SECRET"`
+	RedirectURL    string `mapstructure:"REDIRECT_URL"`
 }
 
 var envs = []string{
-	"DB_HOST", "DB_NAME", "DB_USER", "DB_PORT", "DB_PASSWORD", "PORT","DOCTOR-SVC","PATIENT_SVC" ,"KEY_ID_fOR_PAY","SECRET_KEY_FOR_PAY",
+	"DB_HOST", "DB_NAME", "DB_USER", "DB_PORT", "DB_PASSWORD", "PORT","DOCTOR-SVC","PATIENT_SVC" ,"KEY_ID_fOR_PAY","SECRET_KEY_FOR_PAY","YOUR_CLIENT_ID","YOUR_CLIENT_SECRET",
 }
 
 func LoadConfig() (Config, error) {

@@ -1528,6 +1528,162 @@ func (*BookSlotres) Descriptor() ([]byte, []int) {
 	return file_pkg_pb_admin_admin_proto_rawDescGZIP(), []int{24}
 }
 
+type BookDoctorreq struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	PatientId string `protobuf:"bytes,1,opt,name=patient_id,json=patientId,proto3" json:"patient_id,omitempty"`
+	SlotId    uint32 `protobuf:"varint,2,opt,name=slot_id,json=slotId,proto3" json:"slot_id,omitempty"`
+}
+
+func (x *BookDoctorreq) Reset() {
+	*x = BookDoctorreq{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_pkg_pb_admin_admin_proto_msgTypes[25]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *BookDoctorreq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BookDoctorreq) ProtoMessage() {}
+
+func (x *BookDoctorreq) ProtoReflect() protoreflect.Message {
+	mi := &file_pkg_pb_admin_admin_proto_msgTypes[25]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BookDoctorreq.ProtoReflect.Descriptor instead.
+func (*BookDoctorreq) Descriptor() ([]byte, []int) {
+	return file_pkg_pb_admin_admin_proto_rawDescGZIP(), []int{25}
+}
+
+func (x *BookDoctorreq) GetPatientId() string {
+	if x != nil {
+		return x.PatientId
+	}
+	return ""
+}
+
+func (x *BookDoctorreq) GetSlotId() uint32 {
+	if x != nil {
+		return x.SlotId
+	}
+	return 0
+}
+
+type VerifyPaymentandcalenderreq struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	BookingId uint32 `protobuf:"varint,1,opt,name=booking_id,json=bookingId,proto3" json:"booking_id,omitempty"`
+	PaymentId string `protobuf:"bytes,2,opt,name=payment_id,json=paymentId,proto3" json:"payment_id,omitempty"`
+	RazorId   string `protobuf:"bytes,3,opt,name=razor_id,json=razorId,proto3" json:"razor_id,omitempty"`
+}
+
+func (x *VerifyPaymentandcalenderreq) Reset() {
+	*x = VerifyPaymentandcalenderreq{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_pkg_pb_admin_admin_proto_msgTypes[26]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *VerifyPaymentandcalenderreq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*VerifyPaymentandcalenderreq) ProtoMessage() {}
+
+func (x *VerifyPaymentandcalenderreq) ProtoReflect() protoreflect.Message {
+	mi := &file_pkg_pb_admin_admin_proto_msgTypes[26]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use VerifyPaymentandcalenderreq.ProtoReflect.Descriptor instead.
+func (*VerifyPaymentandcalenderreq) Descriptor() ([]byte, []int) {
+	return file_pkg_pb_admin_admin_proto_rawDescGZIP(), []int{26}
+}
+
+func (x *VerifyPaymentandcalenderreq) GetBookingId() uint32 {
+	if x != nil {
+		return x.BookingId
+	}
+	return 0
+}
+
+func (x *VerifyPaymentandcalenderreq) GetPaymentId() string {
+	if x != nil {
+		return x.PaymentId
+	}
+	return ""
+}
+
+func (x *VerifyPaymentandcalenderreq) GetRazorId() string {
+	if x != nil {
+		return x.RazorId
+	}
+	return ""
+}
+
+type VerifyPaymentandcalenderres struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+}
+
+func (x *VerifyPaymentandcalenderres) Reset() {
+	*x = VerifyPaymentandcalenderres{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_pkg_pb_admin_admin_proto_msgTypes[27]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *VerifyPaymentandcalenderres) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*VerifyPaymentandcalenderres) ProtoMessage() {}
+
+func (x *VerifyPaymentandcalenderres) ProtoReflect() protoreflect.Message {
+	mi := &file_pkg_pb_admin_admin_proto_msgTypes[27]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use VerifyPaymentandcalenderres.ProtoReflect.Descriptor instead.
+func (*VerifyPaymentandcalenderres) Descriptor() ([]byte, []int) {
+	return file_pkg_pb_admin_admin_proto_rawDescGZIP(), []int{27}
+}
+
 var File_pkg_pb_admin_admin_proto protoreflect.FileDescriptor
 
 var file_pkg_pb_admin_admin_proto_rawDesc = []byte{
@@ -1690,7 +1846,21 @@ var file_pkg_pb_admin_admin_proto_rawDesc = []byte{
 	0x09, 0x70, 0x61, 0x74, 0x69, 0x65, 0x6e, 0x74, 0x49, 0x64, 0x12, 0x17, 0x0a, 0x07, 0x73, 0x6c,
 	0x6f, 0x74, 0x5f, 0x69, 0x64, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x06, 0x73, 0x6c, 0x6f,
 	0x74, 0x49, 0x64, 0x22, 0x0d, 0x0a, 0x0b, 0x42, 0x6f, 0x6f, 0x6b, 0x53, 0x6c, 0x6f, 0x74, 0x72,
-	0x65, 0x73, 0x32, 0xae, 0x06, 0x0a, 0x05, 0x41, 0x64, 0x6d, 0x69, 0x6e, 0x12, 0x46, 0x0a, 0x0b,
+	0x65, 0x73, 0x22, 0x47, 0x0a, 0x0d, 0x42, 0x6f, 0x6f, 0x6b, 0x44, 0x6f, 0x63, 0x74, 0x6f, 0x72,
+	0x72, 0x65, 0x71, 0x12, 0x1d, 0x0a, 0x0a, 0x70, 0x61, 0x74, 0x69, 0x65, 0x6e, 0x74, 0x5f, 0x69,
+	0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x70, 0x61, 0x74, 0x69, 0x65, 0x6e, 0x74,
+	0x49, 0x64, 0x12, 0x17, 0x0a, 0x07, 0x73, 0x6c, 0x6f, 0x74, 0x5f, 0x69, 0x64, 0x18, 0x02, 0x20,
+	0x01, 0x28, 0x0d, 0x52, 0x06, 0x73, 0x6c, 0x6f, 0x74, 0x49, 0x64, 0x22, 0x76, 0x0a, 0x1b, 0x56,
+	0x65, 0x72, 0x69, 0x66, 0x79, 0x50, 0x61, 0x79, 0x6d, 0x65, 0x6e, 0x74, 0x61, 0x6e, 0x64, 0x63,
+	0x61, 0x6c, 0x65, 0x6e, 0x64, 0x65, 0x72, 0x72, 0x65, 0x71, 0x12, 0x1d, 0x0a, 0x0a, 0x62, 0x6f,
+	0x6f, 0x6b, 0x69, 0x6e, 0x67, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x09,
+	0x62, 0x6f, 0x6f, 0x6b, 0x69, 0x6e, 0x67, 0x49, 0x64, 0x12, 0x1d, 0x0a, 0x0a, 0x70, 0x61, 0x79,
+	0x6d, 0x65, 0x6e, 0x74, 0x5f, 0x69, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x70,
+	0x61, 0x79, 0x6d, 0x65, 0x6e, 0x74, 0x49, 0x64, 0x12, 0x19, 0x0a, 0x08, 0x72, 0x61, 0x7a, 0x6f,
+	0x72, 0x5f, 0x69, 0x64, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x72, 0x61, 0x7a, 0x6f,
+	0x72, 0x49, 0x64, 0x22, 0x1d, 0x0a, 0x1b, 0x56, 0x65, 0x72, 0x69, 0x66, 0x79, 0x50, 0x61, 0x79,
+	0x6d, 0x65, 0x6e, 0x74, 0x61, 0x6e, 0x64, 0x63, 0x61, 0x6c, 0x65, 0x6e, 0x64, 0x65, 0x72, 0x72,
+	0x65, 0x73, 0x32, 0xcc, 0x07, 0x0a, 0x05, 0x41, 0x64, 0x6d, 0x69, 0x6e, 0x12, 0x46, 0x0a, 0x0b,
 	0x41, 0x64, 0x6d, 0x69, 0x6e, 0x53, 0x69, 0x67, 0x6e, 0x75, 0x70, 0x12, 0x19, 0x2e, 0x61, 0x64,
 	0x6d, 0x69, 0x6e, 0x2e, 0x41, 0x64, 0x6d, 0x69, 0x6e, 0x53, 0x69, 0x67, 0x6e, 0x75, 0x70, 0x52,
 	0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1a, 0x2e, 0x61, 0x64, 0x6d, 0x69, 0x6e, 0x2e, 0x41,
@@ -1741,8 +1911,18 @@ var file_pkg_pb_admin_admin_proto_rawDesc = []byte{
 	0x32, 0x0a, 0x08, 0x42, 0x6f, 0x6f, 0x6b, 0x53, 0x6c, 0x6f, 0x74, 0x12, 0x12, 0x2e, 0x61, 0x64,
 	0x6d, 0x69, 0x6e, 0x2e, 0x42, 0x6f, 0x6f, 0x6b, 0x53, 0x6c, 0x6f, 0x74, 0x72, 0x65, 0x71, 0x1a,
 	0x12, 0x2e, 0x61, 0x64, 0x6d, 0x69, 0x6e, 0x2e, 0x42, 0x6f, 0x6f, 0x6b, 0x53, 0x6c, 0x6f, 0x74,
-	0x72, 0x65, 0x73, 0x42, 0x10, 0x5a, 0x0e, 0x2e, 0x2f, 0x70, 0x6b, 0x67, 0x2f, 0x70, 0x62, 0x2f,
-	0x61, 0x64, 0x6d, 0x69, 0x6e, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x72, 0x65, 0x73, 0x12, 0x35, 0x0a, 0x0a, 0x42, 0x6f, 0x6f, 0x6b, 0x44, 0x6f, 0x63, 0x74, 0x6f,
+	0x72, 0x12, 0x14, 0x2e, 0x61, 0x64, 0x6d, 0x69, 0x6e, 0x2e, 0x42, 0x6f, 0x6f, 0x6b, 0x44, 0x6f,
+	0x63, 0x74, 0x6f, 0x72, 0x72, 0x65, 0x71, 0x1a, 0x11, 0x2e, 0x61, 0x64, 0x6d, 0x69, 0x6e, 0x2e,
+	0x70, 0x61, 0x79, 0x6d, 0x65, 0x6e, 0x74, 0x52, 0x65, 0x73, 0x12, 0x65, 0x0a, 0x19, 0x56, 0x65,
+	0x72, 0x69, 0x66, 0x79, 0x61, 0x6e, 0x64, 0x43, 0x61, 0x6c, 0x65, 0x6e, 0x64, 0x65, 0x72, 0x43,
+	0x72, 0x65, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x22, 0x2e, 0x61, 0x64, 0x6d, 0x69, 0x6e, 0x2e,
+	0x56, 0x65, 0x72, 0x69, 0x66, 0x79, 0x50, 0x61, 0x79, 0x6d, 0x65, 0x6e, 0x74, 0x61, 0x6e, 0x64,
+	0x63, 0x61, 0x6c, 0x65, 0x6e, 0x64, 0x65, 0x72, 0x72, 0x65, 0x71, 0x1a, 0x22, 0x2e, 0x61, 0x64,
+	0x6d, 0x69, 0x6e, 0x2e, 0x56, 0x65, 0x72, 0x69, 0x66, 0x79, 0x50, 0x61, 0x79, 0x6d, 0x65, 0x6e,
+	0x74, 0x61, 0x6e, 0x64, 0x63, 0x61, 0x6c, 0x65, 0x6e, 0x64, 0x65, 0x72, 0x72, 0x65, 0x73, 0x22,
+	0x00, 0x42, 0x10, 0x5a, 0x0e, 0x2e, 0x2f, 0x70, 0x6b, 0x67, 0x2f, 0x70, 0x62, 0x2f, 0x61, 0x64,
+	0x6d, 0x69, 0x6e, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -1757,7 +1937,7 @@ func file_pkg_pb_admin_admin_proto_rawDescGZIP() []byte {
 	return file_pkg_pb_admin_admin_proto_rawDescData
 }
 
-var file_pkg_pb_admin_admin_proto_msgTypes = make([]protoimpl.MessageInfo, 25)
+var file_pkg_pb_admin_admin_proto_msgTypes = make([]protoimpl.MessageInfo, 28)
 var file_pkg_pb_admin_admin_proto_goTypes = []interface{}{
 	(*AdminSignupRequest)(nil),            // 0: admin.AdminSignupRequest
 	(*AdminSignupResponse)(nil),           // 1: admin.AdminSignupResponse
@@ -1784,6 +1964,9 @@ var file_pkg_pb_admin_admin_proto_goTypes = []interface{}{
 	(*GetDoctorAvailabilityResponse)(nil), // 22: admin.GetDoctorAvailabilityResponse
 	(*BookSlotreq)(nil),                   // 23: admin.BookSlotreq
 	(*BookSlotres)(nil),                   // 24: admin.BookSlotres
+	(*BookDoctorreq)(nil),                 // 25: admin.BookDoctorreq
+	(*VerifyPaymentandcalenderreq)(nil),   // 26: admin.VerifyPaymentandcalenderreq
+	(*VerifyPaymentandcalenderres)(nil),   // 27: admin.VerifyPaymentandcalenderres
 }
 var file_pkg_pb_admin_admin_proto_depIdxs = []int32{
 	2,  // 0: admin.AdminSignupResponse.adminDetails:type_name -> admin.AdminDetails
@@ -1803,19 +1986,23 @@ var file_pkg_pb_admin_admin_proto_depIdxs = []int32{
 	18, // 14: admin.Admin.SetDoctorAvailability:input_type -> admin.SetDoctorAvailabilityRequest
 	20, // 15: admin.Admin.GetDoctorAvailability:input_type -> admin.GetDoctorAvailabilityRequest
 	23, // 16: admin.Admin.BookSlot:input_type -> admin.BookSlotreq
-	1,  // 17: admin.Admin.AdminSignup:output_type -> admin.AdminSignupResponse
-	4,  // 18: admin.Admin.AdminLogin:output_type -> admin.AdminLoginResponse
-	7,  // 19: admin.Admin.AddTobookings:output_type -> admin.bookingres
-	7,  // 20: admin.Admin.CancelBookings:output_type -> admin.bookingres
-	10, // 21: admin.Admin.MakePaymentRazorpay:output_type -> admin.paymentRes
-	11, // 22: admin.Admin.VerifyPayment:output_type -> admin.verifyres
-	15, // 23: admin.Admin.GetPaidPatients:output_type -> admin.GetPaidPatientsResponse
-	17, // 24: admin.Admin.CreatePrescription:output_type -> admin.CreatePrescriptionResponse
-	19, // 25: admin.Admin.SetDoctorAvailability:output_type -> admin.SetDoctorAvailabilityResponse
-	22, // 26: admin.Admin.GetDoctorAvailability:output_type -> admin.GetDoctorAvailabilityResponse
-	24, // 27: admin.Admin.BookSlot:output_type -> admin.BookSlotres
-	17, // [17:28] is the sub-list for method output_type
-	6,  // [6:17] is the sub-list for method input_type
+	25, // 17: admin.Admin.BookDoctor:input_type -> admin.BookDoctorreq
+	26, // 18: admin.Admin.VerifyandCalenderCreation:input_type -> admin.VerifyPaymentandcalenderreq
+	1,  // 19: admin.Admin.AdminSignup:output_type -> admin.AdminSignupResponse
+	4,  // 20: admin.Admin.AdminLogin:output_type -> admin.AdminLoginResponse
+	7,  // 21: admin.Admin.AddTobookings:output_type -> admin.bookingres
+	7,  // 22: admin.Admin.CancelBookings:output_type -> admin.bookingres
+	10, // 23: admin.Admin.MakePaymentRazorpay:output_type -> admin.paymentRes
+	11, // 24: admin.Admin.VerifyPayment:output_type -> admin.verifyres
+	15, // 25: admin.Admin.GetPaidPatients:output_type -> admin.GetPaidPatientsResponse
+	17, // 26: admin.Admin.CreatePrescription:output_type -> admin.CreatePrescriptionResponse
+	19, // 27: admin.Admin.SetDoctorAvailability:output_type -> admin.SetDoctorAvailabilityResponse
+	22, // 28: admin.Admin.GetDoctorAvailability:output_type -> admin.GetDoctorAvailabilityResponse
+	24, // 29: admin.Admin.BookSlot:output_type -> admin.BookSlotres
+	10, // 30: admin.Admin.BookDoctor:output_type -> admin.paymentRes
+	27, // 31: admin.Admin.VerifyandCalenderCreation:output_type -> admin.VerifyPaymentandcalenderres
+	19, // [19:32] is the sub-list for method output_type
+	6,  // [6:19] is the sub-list for method input_type
 	6,  // [6:6] is the sub-list for extension type_name
 	6,  // [6:6] is the sub-list for extension extendee
 	0,  // [0:6] is the sub-list for field type_name
@@ -2127,6 +2314,42 @@ func file_pkg_pb_admin_admin_proto_init() {
 				return nil
 			}
 		}
+		file_pkg_pb_admin_admin_proto_msgTypes[25].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*BookDoctorreq); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_pkg_pb_admin_admin_proto_msgTypes[26].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*VerifyPaymentandcalenderreq); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_pkg_pb_admin_admin_proto_msgTypes[27].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*VerifyPaymentandcalenderres); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -2134,7 +2357,7 @@ func file_pkg_pb_admin_admin_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_pkg_pb_admin_admin_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   25,
+			NumMessages:   28,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

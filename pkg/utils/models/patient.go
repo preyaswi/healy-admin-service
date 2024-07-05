@@ -7,9 +7,15 @@ type Patient struct {
 	Gender        string
 	Contactnumber string
 }
-type BookedPatient struct{
-	BookingId int
+type BookedPatient struct {
+	BookingId     int
 	PaymentStatus string
 	Patientdetail Patient
 }
-
+type GooglePatientDetails struct {
+	GoogleID     string
+	GoogleEmail  string
+	AccessToken  string
+	RefreshToken string
+	TokenExpiry  string
+}

@@ -33,6 +33,7 @@ type Booking struct {
 type RazerPay struct {
 	ID        uint    `json:"id" gorm:"primaryKey;not null"`
 	RazorID   string  `json:"razor_id"`
+	PaymentID string  `json:"Payment_id"`
 	BookingID uint    `json:"Booking_id"`
 	Booking   Booking `json:"-" gorm:"foreignKey:BookingID;references:BookingId"`
 }
@@ -53,4 +54,15 @@ type Availability struct {
 	StartTime time.Time
 	EndTime   time.Time
 	IsBooked  bool
+}
+type Event struct {
+    gorm.Model
+    BookingID   uint
+    PatientID   string
+    EventID     string
+    Summary     string
+    Description string
+    Start       time.Time
+    End         time.Time
+    GuestEmail  string
 }
