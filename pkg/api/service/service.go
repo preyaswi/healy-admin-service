@@ -204,8 +204,8 @@ func (ad *AdminServer) BookSlot(ctx context.Context, req *pb.BookSlotreq) (*pb.B
 	}
 	return &pb.BookSlotres{}, nil
 }
-func (ad *AdminServer)BookDoctor(ctx context.Context,req *pb.BookDoctorreq) (*pb.PaymentRes, error)  {
-	bookingdetails,razorid,err:=ad.adminUseCase.BookDoctor(req.PatientId,int(req.SlotId))
+func (ad *AdminServer) BookDoctor(ctx context.Context, req *pb.BookDoctorreq) (*pb.PaymentRes, error) {
+	bookingdetails, razorid, err := ad.adminUseCase.BookDoctor(req.PatientId, int(req.SlotId))
 	if err != nil {
 		return &pb.PaymentRes{}, err
 	}
@@ -223,10 +223,10 @@ func (ad *AdminServer)BookDoctor(ctx context.Context,req *pb.BookDoctorreq) (*pb
 		Razorid:        razorid,
 	}, nil
 }
-func (ad *AdminServer)VerifyandCalenderCreation(ctx context.Context,req *pb.VerifyPaymentandcalenderreq) (*pb.VerifyPaymentandcalenderres, error)  {
-	err:=ad.adminUseCase.VerifyandCalenderCreation(int(req.BookingId),req.PaymentId,req.RazorId)
-	if err!=nil{
-		return &pb.VerifyPaymentandcalenderres{},err
+func (ad *AdminServer) VerifyandCalenderCreation(ctx context.Context, req *pb.VerifyPaymentandcalenderreq) (*pb.VerifyPaymentandcalenderres, error) {
+	err := ad.adminUseCase.VerifyandCalenderCreation(int(req.BookingId), req.PaymentId, req.RazorId)
+	if err != nil {
+		return &pb.VerifyPaymentandcalenderres{}, err
 	}
-	return &pb.VerifyPaymentandcalenderres{},nil
+	return &pb.VerifyPaymentandcalenderres{}, nil
 }

@@ -56,13 +56,13 @@ type Availability struct {
 	IsBooked  bool
 }
 type Event struct {
-    gorm.Model
-    BookingID   uint
-    PatientID   string
-    EventID     string
-    Summary     string
-    Description string
-    Start       time.Time
-    End         time.Time
-    GuestEmail  string
+	gorm.Model
+	BookingID   uint
+	PatientID   string
+	EventID     string
+	Summary     string
+	Description string
+	Start       time.Time
+	End         time.Time
+	GuestEmail  string
 }

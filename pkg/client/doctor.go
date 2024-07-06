@@ -14,8 +14,6 @@ type doctorClient struct {
 	Client papb.DoctorClient
 }
 
-
-
 func NewdoctorClient(cfg *config.Config) *doctorClient {
 	cc, err := grpc.Dial(cfg.DOCTOR_SVC, grpc.WithInsecure())
 	if err != nil {

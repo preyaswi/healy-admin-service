@@ -20,30 +20,30 @@ type AdminSignUp struct {
 	Email     string `json:"email"`
 	Password  string `json:"password"`
 }
-type BookingDoctorDetails struct{
-	Doctorid uint 
-	DoctorName string
+type BookingDoctorDetails struct {
+	Doctorid    uint
+	DoctorName  string
 	DoctorEmail string
-	Fees uint64
+	Fees        uint64
 }
-type Paymentreq struct{
+type Paymentreq struct {
 	Bookingid uint
 }
-type PaymentDetails struct{
-	PatientId uint
-	DoctorId uint
-	Fees uint64
+type PaymentDetails struct {
+	PatientId     uint
+	DoctorId      uint
+	Fees          uint64
 	PaymentStatus string
 }
 
-type SetAvailability struct{
-	DoctorId int
-    Date time.Time 
-	StartTime  time.Time 
-	EndTime time.Time 
+type SetAvailability struct {
+	DoctorId  int
+	Date      time.Time
+	StartTime time.Time
+	EndTime   time.Time
 }
-type AvailableSlots struct{
-	Slot_id int
-	Time string
+type AvailableSlots struct {
+	Slot_id  int
+	Time     string
 	IsBooked bool
 }

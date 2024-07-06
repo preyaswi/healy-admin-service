@@ -16,10 +16,10 @@ type AdminUseCase interface {
 	GetPaidPatients(doctor_id int) ([]models.BookedPatient, error)
 	CreatePrescription(prescription models.PrescriptionRequest) (domain.Prescription, error)
 
-	SetDoctorAvailability(availabiity models.SetAvailability)(string,error)
-	GetDoctorAvailability(dotctorid int,date time.Time)([]models.AvailableSlots,error)
+	SetDoctorAvailability(availabiity models.SetAvailability) (string, error)
+	GetDoctorAvailability(dotctorid int, date time.Time) ([]models.AvailableSlots, error)
 
-	BookSlot(patientid string ,bookingid,slotid int)error
-	BookDoctor(patientid string,slotid int)(domain.Booking, string, error)
-	VerifyandCalenderCreation(bookingid int,paymentid,razorid string)error
+	BookSlot(patientid string, bookingid, slotid int) error
+	BookDoctor(patientid string, slotid int) (domain.Booking, string, error)
+	VerifyandCalenderCreation(bookingid int, paymentid, razorid string) error
 }

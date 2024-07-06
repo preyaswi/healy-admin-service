@@ -9,9 +9,9 @@ type Config struct {
 	DBPort     string `mapstructure:"DB_PORT"`
 	DBPassword string `mapstructure:"DB_PASSWORD"`
 	Port       string `mapstructure:"PORT"`
-	
-	DOCTOR_SVC string `mapstructure:"DOCTOR_SVC"`
-	PATIENT_SVC string `mapstructure:"PATIENT_SVC"`
+
+	DOCTOR_SVC         string `mapstructure:"DOCTOR_SVC"`
+	PATIENT_SVC        string `mapstructure:"PATIENT_SVC"`
 	KEY_ID_fOR_PAY     string `mapstructure:"KEY_ID_fOR_PAY"`
 	SECRET_KEY_FOR_PAY string `mapstructure:"SECRET_KEY_FOR_PAY"`
 
@@ -21,7 +21,7 @@ type Config struct {
 }
 
 var envs = []string{
-	"DB_HOST", "DB_NAME", "DB_USER", "DB_PORT", "DB_PASSWORD", "PORT","DOCTOR-SVC","PATIENT_SVC" ,"KEY_ID_fOR_PAY","SECRET_KEY_FOR_PAY","YOUR_CLIENT_ID","YOUR_CLIENT_SECRET",
+	"DB_HOST", "DB_NAME", "DB_USER", "DB_PORT", "DB_PASSWORD", "PORT", "DOCTOR-SVC", "PATIENT_SVC", "KEY_ID_fOR_PAY", "SECRET_KEY_FOR_PAY", "YOUR_CLIENT_ID", "YOUR_CLIENT_SECRET",
 }
 
 func LoadConfig() (Config, error) {

@@ -394,17 +394,17 @@ func (ad *adminUseCase) createGoogleCalendarEvent(patientDetails models.GooglePa
 		Scopes:       []string{calendar.CalendarScope},
 	}
 
-	  // Parse token expiry
-	  tokenExpiry, err := time.Parse(time.RFC3339, patientDetails.TokenExpiry)
-	  if err != nil {
-		  // If parsing fails, try an alternative approach
-		  tokenExpiry, err = time.Parse("2006-01-02 15:04:05.999999999 -0700 MST", patientDetails.TokenExpiry)
-		  if err != nil {
-			  // If it still fails, use the current time as a fallback
-			  tokenExpiry = time.Now()
-		  }
-	  }
-  
+	// Parse token expiry
+	tokenExpiry, err := time.Parse(time.RFC3339, patientDetails.TokenExpiry)
+	if err != nil {
+		// If parsing fails, try an alternative approach
+		tokenExpiry, err = time.Parse("2006-01-02 15:04:05.999999999 -0700 MST", patientDetails.TokenExpiry)
+		if err != nil {
+			// If it still fails, use the current time as a fallback
+			tokenExpiry = time.Now()
+		}
+	}
+
 	token := &oauth2.Token{
 		AccessToken:  patientDetails.AccessToken,
 		RefreshToken: patientDetails.RefreshToken,

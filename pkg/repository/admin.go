@@ -56,14 +56,14 @@ func (ad *adminRepository) AddToBooking(patientid string, doctordetail models.Bo
 	}
 	return nil
 }
-func (ad *adminRepository) AddDetailsToBooking(patientid string, doctordetail models.BookingDoctorDetails,slotid int) (int, error) {
+func (ad *adminRepository) AddDetailsToBooking(patientid string, doctordetail models.BookingDoctorDetails, slotid int) (int, error) {
 	booking := domain.Booking{
 		PatientId:   patientid,
 		DoctorId:    doctordetail.Doctorid,
 		DoctorName:  doctordetail.DoctorName,
 		DoctorEmail: doctordetail.DoctorEmail,
 		Fees:        doctordetail.Fees,
-		Slot_id: uint(slotid),
+		Slot_id:     uint(slotid),
 	}
 
 	// Create the booking record
@@ -85,7 +85,7 @@ func (ad *adminRepository) GetBookingByID(bookingid int) (domain.Booking, error)
 	}
 	return booking, nil
 }
-func (ad *adminRepository)UpdateSlotAvailability(slotid int)error  {
+func (ad *adminRepository) UpdateSlotAvailability(slotid int) error {
 	slot := &domain.Availability{}
 
 	// Find the slot by ID and update the IsBooked field to true
@@ -97,12 +97,12 @@ func (ad *adminRepository)UpdateSlotAvailability(slotid int)error  {
 	return nil
 }
 func (ar *adminRepository) GetAvailabilityByID(slotID int) (domain.Availability, error) {
-    var availability domain.Availability
-    err := ar.DB.First(&availability, slotID).Error
-    return availability, err
+	var availability domain.Availability
+	err := ar.DB.First(&availability, slotID).Error
+	return availability, err
 }
 func (ar *adminRepository) StoreEventDetails(event domain.Event) error {
-    return ar.DB.Create(&event).Error
+	return ar.DB.Create(&event).Error
 }
 func (ad *adminRepository) RemoveBooking(bookingID int) error {
 	err := ad.DB.Where("booking_id=?", bookingID).Delete(&domain.Booking{}).Error
@@ -184,78 +184,78 @@ func (ad *adminRepository) CreatePrescription(prescription models.PrescriptionRe
 	return createdPrescription, nil
 }
 func (ad *adminRepository) SetDoctorAvailability(availability models.SetAvailability) (string, error) {
-    fmt.Println(availability, "availability")
-    var slots []domain.Availability
-    currentTime := availability.StartTime
-    for currentTime.Before(availability.EndTime) {
-        // Define the end time for the current slot
-        slotEndTime := currentTime.Add(30 * time.Minute)
+	fmt.Println(availability, "availability")
+	var slots []domain.Availability
+	currentTime := availability.StartTime
+	for currentTime.Before(availability.EndTime) {
+		// Define the end time for the current slot
+		slotEndTime := currentTime.Add(30 * time.Minute)
 
-        // Combine date and time
-        startDateTime := time.Date(
-            availability.Date.Year(),
-            availability.Date.Month(),
-            availability.Date.Day(),
-            currentTime.Hour(),
-            currentTime.Minute(),
-            currentTime.Second(),
-            currentTime.Nanosecond(),
-            availability.Date.Location(),
-        )
+		// Combine date and time
+		startDateTime := time.Date(
+			availability.Date.Year(),
+			availability.Date.Month(),
+			availability.Date.Day(),
+			currentTime.Hour(),
+			currentTime.Minute(),
+			currentTime.Second(),
+			currentTime.Nanosecond(),
+			availability.Date.Location(),
+		)
 
-        endDateTime := time.Date(
-            availability.Date.Year(),
-            availability.Date.Month(),
-            availability.Date.Day(),
-            slotEndTime.Hour(),
-            slotEndTime.Minute(),
-            slotEndTime.Second(),
-            slotEndTime.Nanosecond(),
-            availability.Date.Location(),
-        )
+		endDateTime := time.Date(
+			availability.Date.Year(),
+			availability.Date.Month(),
+			availability.Date.Day(),
+			slotEndTime.Hour(),
+			slotEndTime.Minute(),
+			slotEndTime.Second(),
+			slotEndTime.Nanosecond(),
+			availability.Date.Location(),
+		)
 
-        // Check for overlapping slots
-        var existingSlots []domain.Availability
-        err := ad.DB.Where("doctor_id = ? AND date = ? AND ((start_time < ? AND end_time > ?) OR (start_time < ? AND end_time > ?) OR (start_time >= ? AND end_time <= ?))",
-            availability.DoctorId, availability.Date, endDateTime, startDateTime, startDateTime, endDateTime, startDateTime, endDateTime).Find(&existingSlots).Error
+		// Check for overlapping slots
+		var existingSlots []domain.Availability
+		err := ad.DB.Where("doctor_id = ? AND date = ? AND ((start_time < ? AND end_time > ?) OR (start_time < ? AND end_time > ?) OR (start_time >= ? AND end_time <= ?))",
+			availability.DoctorId, availability.Date, endDateTime, startDateTime, startDateTime, endDateTime, startDateTime, endDateTime).Find(&existingSlots).Error
 
-        if err != nil {
-            return "", err
-        }
+		if err != nil {
+			return "", err
+		}
 
-        // If no overlapping slots found, add the new slot to the list
-        if len(existingSlots) == 0 {
-            slots = append(slots, domain.Availability{
-                DoctorID:  uint(availability.DoctorId),
-                Date:      availability.Date,
-                StartTime: startDateTime,
-                EndTime:   endDateTime,
-                IsBooked:  false,
-            })
-        }
+		// If no overlapping slots found, add the new slot to the list
+		if len(existingSlots) == 0 {
+			slots = append(slots, domain.Availability{
+				DoctorID:  uint(availability.DoctorId),
+				Date:      availability.Date,
+				StartTime: startDateTime,
+				EndTime:   endDateTime,
+				IsBooked:  false,
+			})
+		}
 
-        // Move to the next 30-minute slot
-        currentTime = slotEndTime
-    }
+		// Move to the next 30-minute slot
+		currentTime = slotEndTime
+	}
 
-    // Check if there are slots to be inserted
-    if len(slots) == 0 {
-        fmt.Println(availability, "the availability")
-        return "", errors.New("no available slots to be added")
-    }
+	// Check if there are slots to be inserted
+	if len(slots) == 0 {
+		fmt.Println(availability, "the availability")
+		return "", errors.New("no available slots to be added")
+	}
 
-    // Save the non-overlapping slots to the database
-    if err := ad.DB.Create(&slots).Error; err != nil {
-        return "", err
-    }
-    return "success", nil
+	// Save the non-overlapping slots to the database
+	if err := ad.DB.Create(&slots).Error; err != nil {
+		return "", err
+	}
+	return "success", nil
 }
 func (ad *adminRepository) GetDoctorAvailability(doctor_id int, date time.Time) ([]models.AvailableSlots, error) {
 	var slots []domain.Availability
 	if err := ad.DB.Where("doctor_id = ? AND date = ?", doctor_id, date).Find(&slots).Error; err != nil {
 		return []models.AvailableSlots{}, err
 	}
-	fmt.Println(slots,"the slots when getting")
+	fmt.Println(slots, "the slots when getting")
 	var newslots []models.AvailableSlots
 	for _, slot := range slots {
 		newslots = append(newslots, models.AvailableSlots{
@@ -303,7 +303,7 @@ func (ad *adminRepository) GetDoctorIdFromSlotId(slotid int) (int, error) {
 	return int(availability.DoctorID), nil
 
 }
-func (ad *adminRepository)UpdatePaymentDetails(bookingid int,paymentid string) error {
+func (ad *adminRepository) UpdatePaymentDetails(bookingid int, paymentid string) error {
 	err := ad.DB.Exec("update razer_pays set payment_id = ? where booking_id = ?", paymentid, bookingid).Error
 	if err != nil {
 		return err
