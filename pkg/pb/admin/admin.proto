@@ -69,7 +69,7 @@ message paymentReq{
 }
 message PaymentDetails {
   uint32 booking_id =1;
-  string patient_id = 2;
+  string patient_name = 2;
   uint32 doctor_id = 3;
   string doctor_name=4;
   string doctor_email=5;
@@ -94,8 +94,9 @@ message Patient {
 }
 message BookedPatient {
     uint32 booking_id = 1;
-    string payment_status=2;
-    Patient patient_detail = 3;
+    uint32 slot_id=2;
+    string payment_status=3;
+    Patient patient_detail = 4;
 }
 message GetPaidPatientsResponse {
   repeated BookedPatient booked_patients = 1;
@@ -103,10 +104,9 @@ message GetPaidPatientsResponse {
 message CreatePrescriptionRequest {
     uint32 booking_id = 1;
     uint32 doctor_id = 2;
-    string patient_id = 3;
-    string medicine = 4;
-    string dosage = 5;
-    string notes = 6;
+    string medicine = 3;
+    string dosage = 4;
+    string notes = 5;
 }
 
 message CreatePrescriptionResponse {

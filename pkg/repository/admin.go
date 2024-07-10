@@ -165,7 +165,6 @@ func (ad *adminRepository) CreatePrescription(prescription models.PrescriptionRe
 	prescriptionModel := domain.Prescription{
 		BookingID: uint(prescription.BookingID),
 		DoctorID:  uint(prescription.DoctorID),
-		PatientID: prescription.PatientID,
 		Medicine:  prescription.Medicine,
 		Dosage:    prescription.Dosage,
 		Notes:     prescription.Notes,

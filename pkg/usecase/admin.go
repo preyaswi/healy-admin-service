@@ -136,6 +136,12 @@ func (ad *adminUseCase) MakePaymentRazorpay(bookingid int) (domain.Booking, stri
 	if err != nil {
 		return domain.Booking{}, "", err
 	}
+	patientdetails,err:=ad.patientRepository.GetPatientByID(paymentdetail.PatientId)
+	if err!=nil{
+		return domain.Booking{}, "", err
+	}
+	paymentdetail.PatientId=patientdetails.Fullname
+	fmt.Println(paymentdetail,"tyuiokn")
 	client := razorpay.NewClient(cfg.KEY_ID_fOR_PAY, cfg.SECRET_KEY_FOR_PAY)
 	data := map[string]interface{}{
 		"amount":   int(paymentdetail.Fees) * 100,
@@ -193,6 +199,7 @@ func (ad *adminUseCase) GetPaidPatients(doctor_id int) ([]models.BookedPatient, 
 			mu.Lock()
 			bookedPatients[i] = models.BookedPatient{
 				BookingId:     int(booking.BookingId),
+				SlotId: int(booking.Slot_id),
 				PaymentStatus: booking.PaymentStatus,
 				Patientdetail: patient,
 			}
@@ -212,15 +219,16 @@ func (ad *adminUseCase) GetPaidPatients(doctor_id int) ([]models.BookedPatient, 
 	return bookedPatients, nil
 }
 func (ad *adminUseCase) CreatePrescription(prescription models.PrescriptionRequest) (domain.Prescription, error) {
-	paid, err := ad.adminRepository.CheckPatientPayment(prescription.PatientID, prescription.BookingID)
-	if err != nil {
-		return domain.Prescription{}, fmt.Errorf("error checking payment status")
+	bookingsdetails,err:=ad.adminRepository.GetBookingByID(prescription.BookingID)
+	if err!=nil{
+		return domain.Prescription{},err
 	}
-
-	if !paid {
+	if bookingsdetails.DoctorId!=uint(prescription.DoctorID){
+		return domain.Prescription{},errors.New("the bookingid doctor and the request doctor id is not same")
+	}
+	if bookingsdetails.PaymentStatus!="paid"{
 		return domain.Prescription{}, fmt.Errorf("patient has not paid the booking fee")
 	}
-
 	createdPrescription, err := ad.adminRepository.CreatePrescription(prescription)
 	if err != nil {
 		return domain.Prescription{}, fmt.Errorf("error creating prescription")
@@ -298,6 +306,7 @@ func (ad *adminUseCase) BookDoctor(patientid string, slotid int) (domain.Booking
 	if err != nil {
 		return domain.Booking{}, "", err
 	}
+	
 	client := razorpay.NewClient(cfg.KEY_ID_fOR_PAY, cfg.SECRET_KEY_FOR_PAY)
 	data := map[string]interface{}{
 		"amount":   int(doctordetail.Fees) * 100,
@@ -319,6 +328,11 @@ func (ad *adminUseCase) BookDoctor(patientid string, slotid int) (domain.Booking
 	if err != nil {
 		return domain.Booking{}, "", err
 	}
+	patientdetails,err:=ad.patientRepository.GetPatientByID(paymentdetail.PatientId)
+	if err!=nil{
+		return domain.Booking{}, "", err
+	}
+	paymentdetail.PatientId=patientdetails.Fullname
 	return paymentdetail, RazorpayorderId, nil
 }
 func (ad *adminUseCase) VerifyandCalenderCreation(bookingid int, paymentid, razorid string) error {

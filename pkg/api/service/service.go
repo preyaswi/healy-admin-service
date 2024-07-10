@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 	pb "healy-admin/pkg/pb/admin"
 	interfaces "healy-admin/pkg/usecase/interface"
 	"healy-admin/pkg/utils/models"
@@ -90,7 +91,7 @@ func (ad *AdminServer) MakePaymentRazorpay(ctx context.Context, req *pb.PaymentR
 	}
 	paymentDetail := &pb.PaymentDetails{
 		BookingId:     uint32(paymentDetails.BookingId),
-		PatientId:     paymentDetails.PatientId,
+		PatientName:     paymentDetails.PatientId,
 		DoctorId:      uint32(paymentDetails.DoctorId),
 		DoctorName:    paymentDetails.DoctorName,
 		DoctorEmail:   paymentDetails.DoctorEmail,
@@ -119,6 +120,7 @@ func (ad *AdminServer) GetPaidPatients(ctx context.Context, req *pb.GetPaidPatie
 	for i, bp := range bookedPatients {
 		pbBookedPatients[i] = &pb.BookedPatient{
 			BookingId:     uint32(bp.BookingId),
+			SlotId: uint32(bp.SlotId),
 			PaymentStatus: bp.PaymentStatus,
 			PatientDetail: &pb.Patient{
 				Id:            uint32(bp.Patientdetail.Id),
@@ -137,7 +139,6 @@ func (ad *AdminServer) GetPaidPatients(ctx context.Context, req *pb.GetPaidPatie
 func (ad *AdminServer) CreatePrescription(ctx context.Context, req *pb.CreatePrescriptionRequest) (*pb.CreatePrescriptionResponse, error) {
 	prescriptionreq := models.PrescriptionRequest{
 		DoctorID:  int(req.DoctorId),
-		PatientID: req.PatientId,
 		BookingID: int(req.BookingId),
 		Medicine:  req.Medicine,
 		Dosage:    req.Dosage,
@@ -209,9 +210,10 @@ func (ad *AdminServer) BookDoctor(ctx context.Context, req *pb.BookDoctorreq) (*
 	if err != nil {
 		return &pb.PaymentRes{}, err
 	}
+	fmt.Println(bookingdetails.PatientId,"patient name in adminservice")
 	paymentDetail := &pb.PaymentDetails{
 		BookingId:     uint32(bookingdetails.BookingId),
-		PatientId:     bookingdetails.PatientId,
+		PatientName:     bookingdetails.PatientId,
 		DoctorId:      uint32(bookingdetails.DoctorId),
 		DoctorName:    bookingdetails.DoctorName,
 		DoctorEmail:   bookingdetails.DoctorEmail,

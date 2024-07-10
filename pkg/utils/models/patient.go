@@ -9,6 +9,7 @@ type Patient struct {
 }
 type BookedPatient struct {
 	BookingId     int
+	SlotId        int
 	PaymentStatus string
 	Patientdetail Patient
 }
